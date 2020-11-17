@@ -10,9 +10,12 @@ module Shared exposing
 
 import Browser.Navigation exposing (Key)
 import Element exposing (..)
+import Element.Background as Background
 import Element.Font as Font
 import Spa.Document exposing (Document)
 import Spa.Generated.Route as Route
+import UI.Colors as Colors
+import UI.Fonts as Fonts
 import Url exposing (Url)
 
 
@@ -68,10 +71,33 @@ view :
 view { page, toMsg } model =
     { title = page.title
     , body =
-        [ column [ padding 20, spacing 20, height fill ]
-            [ row [ spacing 20 ]
-                [ link [ Font.color (rgb 0 0.25 0.5), Font.underline ] { url = Route.toString Route.Top, label = text "Homepage" }
-                , link [ Font.color (rgb 0 0.25 0.5), Font.underline ] { url = Route.toString Route.NotFound, label = text "Not found" }
+        [ column
+            [ spacing 20
+            , height fill
+            , width fill
+            ]
+            [ row
+                [ width fill
+                , spacing 20
+                , paddingXY 20 30
+                , Background.color Colors.lightPurple
+                ]
+                [ link []
+                    { url = Route.toString Route.Top
+                    , label =
+                        row [ spacing 7 ]
+                            [ image [ Element.width (Element.px 36) ]
+                                { src = "../public/images/badge-outline-colored.svg"
+                                , description = "Fission logo"
+                                }
+                            , el
+                                [ Font.size 28
+                                , Font.family Fonts.workSans
+                                , Font.color Colors.darkGray
+                                ]
+                                (text "Fission PWA Generator")
+                            ]
+                    }
                 ]
             , column [ height fill ] page.body
             ]
