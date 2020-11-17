@@ -1,5 +1,6 @@
-module Pages.Create exposing (Params, Model, Msg, page)
+module Pages.Create exposing (Model, Msg, Params, page)
 
+import Session exposing (Session)
 import Shared
 import Spa.Document exposing (Document)
 import Spa.Page as Page exposing (Page)
@@ -27,12 +28,14 @@ type alias Params =
 
 
 type alias Model =
-    {}
+    { session : Session }
 
 
 init : Shared.Model -> Url Params -> ( Model, Cmd Msg )
 init shared { params } =
-    ( {}, Cmd.none )
+    ( { session = shared.session }
+    , Cmd.none
+    )
 
 
 
@@ -57,7 +60,9 @@ save model shared =
 
 load : Shared.Model -> Model -> ( Model, Cmd Msg )
 load shared model =
-    ( model, Cmd.none )
+    ( { model | session = shared.session }
+    , Cmd.none
+    )
 
 
 subscriptions : Model -> Sub Msg
