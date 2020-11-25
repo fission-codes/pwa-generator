@@ -1,4 +1,4 @@
-module Manifest.Icon exposing (Icon, decoder, encode)
+module Manifest.Icon exposing (Icon, decoder, encode, placeholder)
 
 import Json.Decode as Decode exposing (Decoder)
 import Json.Decode.Pipeline exposing (required)
@@ -29,3 +29,8 @@ encode icon =
         , ( "sizes", Encode.string icon.sizes )
         , ( "type", Encode.string icon.mimeType )
         ]
+
+
+placeholder : Icon
+placeholder =
+    Icon "icon.png" "256x256" "image/png"

@@ -1,4 +1,4 @@
-module Manifest exposing (Manifest)
+module Manifest exposing (Manifest, decoder, encode)
 
 import Json.Decode as Decode exposing (Decoder)
 import Json.Decode.Pipeline exposing (required)
@@ -54,3 +54,44 @@ encode manifest =
         , ( "orientation", Orientation.encode manifest.orientation )
         , ( "icons", Encode.list Icon.encode manifest.icons )
         ]
+
+
+placeholderManifests : List Manifest
+placeholderManifests =
+    [ Manifest
+        "Deluxe Chess"
+        "chess"
+        "A full-featured chess game."
+        "en-US"
+        "/"
+        "/"
+        "#ffffff"
+        "#dd1111"
+        Display.placeholder
+        Orientation.placeholder
+        []
+    , Manifest
+        "Ultimate Crypto Plunge"
+        "cryptoplunge"
+        "Learn cryptography through puzzles"
+        "hr"
+        "/"
+        "/"
+        "#000000"
+        "#ffffff"
+        Display.placeholder
+        Orientation.placeholder
+        [ Icon.placeholder ]
+    , Manifest
+        "Flight of the Condor"
+        "Condor"
+        "Fly as if you were the mighty condor!"
+        "gu"
+        "/"
+        "/"
+        "#111111"
+        "#2222ee"
+        Display.placeholder
+        Orientation.placeholder
+        [ Icon.placeholder, Icon.placeholder ]
+    ]

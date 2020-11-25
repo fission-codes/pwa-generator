@@ -1,4 +1,10 @@
-module Manifest.Display exposing (Display, decoder, displayToString, encode)
+module Manifest.Display exposing
+    ( Display
+    , decoder
+    , displayToString
+    , encode
+    , placeholder
+    )
 
 import Json.Decode as Decode exposing (Decoder)
 import Json.Encode as Encode exposing (Value)
@@ -49,7 +55,12 @@ displayToString display =
             "standalone"
 
         MinimalUI ->
-            "mininal-ui"
+            "minimal-ui"
 
         Browser ->
             "browser"
+
+
+placeholder : Display
+placeholder =
+    Fullscreen

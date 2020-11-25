@@ -1,4 +1,10 @@
-module Manifest.Orientation exposing (Orientation, decoder, encode, orientationToString)
+module Manifest.Orientation exposing
+    ( Orientation
+    , decoder
+    , encode
+    , orientationToString
+    , placeholder
+    )
 
 import Json.Decode as Decode exposing (Decoder)
 import Json.Encode as Encode exposing (Value)
@@ -81,3 +87,8 @@ orientationToString orientation =
 
         LandscapeSecondary ->
             "landscape-secondary"
+
+
+placeholder : Orientation
+placeholder =
+    Any
