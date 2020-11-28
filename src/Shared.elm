@@ -17,6 +17,7 @@ import Element.Border as Border
 import Element.Font as Font
 import Element.Input as Input
 import Html.Attributes exposing (class)
+import Manifest exposing (Manifest)
 import Session exposing (Session)
 import Spa.Document exposing (Document)
 import Spa.Generated.Route as Route
@@ -135,7 +136,7 @@ view { page, toMsg } model =
                 , viewSignInButton
                     { session = model.session, toMsg = toMsg }
                 ]
-            , column [ height fill ] page.body
+            , column [ width fill, height fill ] page.body
             ]
         ]
     }

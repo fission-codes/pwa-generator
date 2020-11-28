@@ -1,4 +1,4 @@
-module Manifest exposing (Manifest, decoder, encode)
+module Manifest exposing (Manifest, decoder, encode, placeholders)
 
 import Json.Decode as Decode exposing (Decoder)
 import Json.Decode.Pipeline exposing (required)
@@ -56,8 +56,8 @@ encode manifest =
         ]
 
 
-placeholderManifests : List Manifest
-placeholderManifests =
+placeholders : List Manifest
+placeholders =
     [ Manifest
         "Deluxe Chess"
         "chess"

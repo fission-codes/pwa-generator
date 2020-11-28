@@ -1,5 +1,6 @@
 module UI.Colors exposing
     ( darkGray
+    , lightGray
     , lightPurple
     , purple
     , white
@@ -26,3 +27,8 @@ white =
 darkGray : Color
 darkGray =
     rgb255 50 50 50
+
+
+lightGray : Color
+lightGray =
+    rgb255 200 200 200
