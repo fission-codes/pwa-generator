@@ -9,12 +9,14 @@ module Shared exposing
     )
 
 import Api
+import Browser.Events
 import Browser.Navigation exposing (Key)
 import Element exposing (..)
 import Element.Background as Background
 import Element.Border as Border
 import Element.Font as Font
 import Element.Input as Input
+import Html.Attributes exposing (class)
 import Session exposing (Session)
 import Spa.Document exposing (Document)
 import Spa.Generated.Route as Route
@@ -28,19 +30,26 @@ import Url exposing (Url)
 
 
 type alias Flags =
-    ()
+    { window : Window }
+
+
+type alias Window =
+    { width : Int
+    , height : Int
+    }
 
 
 type alias Model =
     { url : Url
     , key : Key
     , session : Session
+    , device : Device
     }
 
 
 init : Flags -> Url -> Key -> ( Model, Cmd Msg )
 init flags url key =
-    ( Model url key Session.loading
+    ( Model url key Session.loading (classifyDevice flags.window)
     , Cmd.none
     )
 
@@ -52,6 +61,7 @@ init flags url key =
 type Msg
     = Login
     | GotSession Session
+    | GotWindowResize Window
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -67,10 +77,21 @@ update msg model =
             , Cmd.none
             )
 
+        GotWindowResize window ->
+            ( { model | device = classifyDevice window }
+            , Cmd.none
+            )
+
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Session.changes GotSession
+    Sub.batch
+        [ Session.changes GotSession
+        , Browser.Events.onResize
+            (\width height ->
+                GotWindowResize { width = width, height = height }
+            )
+        ]
 
 
 

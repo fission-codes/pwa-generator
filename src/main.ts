@@ -5,6 +5,12 @@ import { Elm } from './Main.elm';
 
 const app = Elm.Main.init({
   node: document.querySelector('main'),
+  flags: {
+    window: {
+      width: window.innerWidth,
+      height: window.innerHeight
+    }
+  }
 });
 
 let fs;
