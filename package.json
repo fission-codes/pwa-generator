@@ -20,7 +20,7 @@
   "author": "Brian Ginsburg",
   "license": "",
   "dependencies": {
-    "webnative": "^0.19.12"
+    "webnative": "^0.20.3"
   },
   "devDependencies": {
     "chokidar-cli": "2.1.0",
