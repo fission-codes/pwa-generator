@@ -3,6 +3,7 @@ module Pages.Edit.AppShortName_String exposing (Model, Msg, Params, page)
 import Element exposing (..)
 import Element.Border as Border
 import Element.Font as Font
+import Manifest exposing (Manifest)
 import Material.Icons.Outlined as MaterialIcons
 import Material.Icons.Types exposing (Coloring(..))
 import Session exposing (Session)
@@ -37,13 +38,24 @@ type alias Params =
 type alias Model =
     { session : Session
     , device : Device
+    , appShortName : String
+    , manifest : Maybe Manifest
     }
 
 
 init : Shared.Model -> Url Params -> ( Model, Cmd Msg )
 init shared { params } =
+    let
+        maybeManifest =
+            List.head <|
+                List.filter
+                    (\manifest -> manifest.shortName == params.appShortName)
+                    shared.manifests
+    in
     ( { session = shared.session
       , device = shared.device
+      , appShortName = params.appShortName
+      , manifest = maybeManifest
       }
     , Cmd.none
     )
@@ -69,14 +81,38 @@ save model shared =
     shared
 
 
+{-| We want to load the manifest once after the user authenticates.
+After each write to web native, we update the manifest in Shared, which
+keeps it in sync when we return to the page. Loading it once prevents
+a data tug-of-war while the user it editing.
+-}
 load : Shared.Model -> Model -> ( Model, Cmd Msg )
 load shared model =
-    ( { model
-        | session = shared.session
-        , device = shared.device
-      }
-    , Cmd.none
-    )
+    case model.manifest of
+        Just manifest ->
+            ( { model
+                | session = shared.session
+                , device = shared.device
+                , manifest = Just manifest
+              }
+            , Cmd.none
+            )
+
+        Nothing ->
+            let
+                maybeManifest =
+                    List.head <|
+                        List.filter
+                            (\manifest -> manifest.shortName == model.appShortName)
+                            shared.manifests
+            in
+            ( { model
+                | session = shared.session
+                , device = shared.device
+                , manifest = maybeManifest
+              }
+            , Cmd.none
+            )
 
 
 subscriptions : Model -> Sub Msg

@@ -47,7 +47,7 @@ init : Shared.Model -> Url Params -> ( Model, Cmd Msg )
 init shared { params } =
     ( { session = shared.session
       , device = shared.device
-      , manifests = Manifest.placeholders
+      , manifests = shared.manifests
       }
     , Cmd.none
     )

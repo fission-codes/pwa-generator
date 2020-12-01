@@ -45,12 +45,18 @@ type alias Model =
     , key : Key
     , session : Session
     , device : Device
+    , manifests : List Manifest
     }
 
 
 init : Flags -> Url -> Key -> ( Model, Cmd Msg )
 init flags url key =
-    ( Model url key Session.loading (classifyDevice flags.window)
+    ( Model
+        url
+        key
+        Session.loading
+        (classifyDevice flags.window)
+        Manifest.placeholders
     , Cmd.none
     )
 
