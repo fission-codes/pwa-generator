@@ -1,4 +1,10 @@
-module Manifest exposing (Manifest, decoder, encode, placeholders)
+module Manifest exposing
+    ( Manifest
+    , decoder
+    , encode
+    , init
+    , placeholders
+    )
 
 import Json.Decode as Decode exposing (Decoder)
 import Json.Decode.Pipeline exposing (required)
@@ -20,6 +26,22 @@ type alias Manifest =
     , display : Display
     , orientation : Orientation
     , icons : List Icon
+    }
+
+
+init : Manifest
+init =
+    { name = ""
+    , shortName = ""
+    , description = ""
+    , lang = "en"
+    , startUrl = "/"
+    , scope = "/"
+    , backgroundColor = "#ffffff"
+    , themeColor = "#ebecf5"
+    , display = Display.init
+    , orientation = Orientation.init
+    , icons = []
     }
 
 
@@ -67,8 +89,8 @@ placeholders =
         "/"
         "#ffffff"
         "#dd1111"
-        Display.placeholder
-        Orientation.placeholder
+        Display.init
+        Orientation.init
         []
     , Manifest
         "Ultimate Crypto Plunge"
@@ -79,8 +101,8 @@ placeholders =
         "/"
         "#000000"
         "#ffffff"
-        Display.placeholder
-        Orientation.placeholder
+        Display.init
+        Orientation.init
         [ Icon.placeholder ]
     , Manifest
         "Flight of the Condor"
@@ -91,7 +113,7 @@ placeholders =
         "/"
         "#111111"
         "#2222ee"
-        Display.placeholder
-        Orientation.placeholder
+        Display.init
+        Orientation.init
         [ Icon.placeholder, Icon.placeholder ]
     ]

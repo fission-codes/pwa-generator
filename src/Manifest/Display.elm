@@ -3,7 +3,7 @@ module Manifest.Display exposing
     , decoder
     , displayToString
     , encode
-    , placeholder
+    , init
     )
 
 import Json.Decode as Decode exposing (Decoder)
@@ -15,6 +15,11 @@ type Display
     | Standalone
     | MinimalUI
     | Browser
+
+
+init : Display
+init =
+    Standalone
 
 
 decoder : Decoder Display
@@ -59,8 +64,3 @@ displayToString display =
 
         Browser ->
             "browser"
-
-
-placeholder : Display
-placeholder =
-    Fullscreen

@@ -2,8 +2,8 @@ module Manifest.Orientation exposing
     ( Orientation
     , decoder
     , encode
+    , init
     , orientationToString
-    , placeholder
     )
 
 import Json.Decode as Decode exposing (Decoder)
@@ -19,6 +19,11 @@ type Orientation
     | PortraitSecondary
     | LandscapePrimary
     | LandscapeSecondary
+
+
+init : Orientation
+init =
+    Natural
 
 
 decoder : Decoder Orientation
@@ -87,8 +92,3 @@ orientationToString orientation =
 
         LandscapeSecondary ->
             "landscape-secondary"
-
-
-placeholder : Orientation
-placeholder =
-    Any
