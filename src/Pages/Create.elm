@@ -1,5 +1,6 @@
 module Pages.Create exposing (Model, Msg, Params, page)
 
+import Components.ManifestEditor as ManifestEditor exposing (ManifestEditor)
 import Element exposing (..)
 import Element.Border as Border
 import Element.Font as Font

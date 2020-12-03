@@ -1,5 +1,6 @@
 module Pages.Preview.AppShortName_String exposing (Model, Msg, Params, page)
 
+import Components.ManifestViewer as ManifestViewer exposing (ManifestViewer)
 import Element exposing (..)
 import Element.Border as Border
 import Element.Font as Font
