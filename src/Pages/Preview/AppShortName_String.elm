@@ -1,4 +1,4 @@
-module Pages.Edit.AppShortName_String exposing (Model, Msg, Params, page)
+module Pages.Preview.AppShortName_String exposing (Model, Msg, Params, page)
 
 import Element exposing (..)
 import Element.Border as Border
@@ -81,38 +81,14 @@ save model shared =
     shared
 
 
-{-| We want to load the manifest once after the user authenticates.
-After each write to web native, we update the manifest in Shared, which
-keeps it in sync when we return to the page. Loading it once prevents
-a data tug-of-war while the user it editing.
--}
 load : Shared.Model -> Model -> ( Model, Cmd Msg )
 load shared model =
-    case model.manifest of
-        Just manifest ->
-            ( { model
-                | session = shared.session
-                , device = shared.device
-                , manifest = Just manifest
-              }
-            , Cmd.none
-            )
-
-        Nothing ->
-            let
-                maybeManifest =
-                    List.head <|
-                        List.filter
-                            (\manifest -> manifest.shortName == model.appShortName)
-                            shared.manifests
-            in
-            ( { model
-                | session = shared.session
-                , device = shared.device
-                , manifest = maybeManifest
-              }
-            , Cmd.none
-            )
+    ( { model
+        | session = shared.session
+        , device = shared.device
+      }
+    , Cmd.none
+    )
 
 
 subscriptions : Model -> Sub Msg
@@ -126,7 +102,7 @@ subscriptions model =
 
 view : Model -> Document Msg
 view model =
-    { title = "Editing " ++ model.appShortName
+    { title = "Previewing " ++ model.appShortName
     , body =
         [ case model.device.class of
             Phone ->
@@ -136,8 +112,7 @@ view model =
                 case model.device.orientation of
                     Portrait ->
                         column [ width fill, paddingXY 10 20, spacing 20 ]
-                            [ viewEditorControls
-                            ]
+                            []
 
                     Landscape ->
                         column
@@ -146,8 +121,7 @@ view model =
                             , paddingXY 0 30
                             , spacing 30
                             ]
-                            [ viewEditorControls
-                            ]
+                            []
 
             _ ->
                 column
@@ -156,32 +130,6 @@ view model =
                     , paddingXY 0 30
                     , spacing 30
                     ]
-                    [ viewEditorControls
-                    ]
+                    []
         ]
     }
-
-
-viewEditorControls : Element Msg
-viewEditorControls =
-    row
-        [ width fill
-        , Border.width 1
-        , Border.color Colors.lightGray
-        ]
-        [ row [ alignRight, spacing 5, Font.color Colors.darkGray ]
-            [ el [] <|
-                html <|
-                    MaterialIcons.edit 28 Inherit
-            , link []
-                { url = Route.toString Route.Top
-                , label =
-                    el [] <|
-                        html <|
-                            MaterialIcons.delete 28 Inherit
-                }
-            , el [] <|
-                html <|
-                    MaterialIcons.save_alt 28 Inherit
-            ]
-        ]
