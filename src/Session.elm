@@ -2,6 +2,7 @@ module Session exposing
     ( Session
     , changes
     , isGuest
+    , isLoading
     , loading
     , viewer
     )
@@ -38,6 +39,16 @@ isGuest : Session -> Bool
 isGuest session =
     case session of
         Guest ->
+            True
+
+        _ ->
+            False
+
+
+isLoading : Session -> Bool
+isLoading session =
+    case session of
+        Loading ->
             True
 
         _ ->
