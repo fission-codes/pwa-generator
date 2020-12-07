@@ -1,6 +1,7 @@
 module Pages.Top exposing (Model, Msg, Params, page)
 
 import Element exposing (..)
+import Element.Background as Background
 import Element.Border as Border
 import Element.Font as Font
 import Html.Attributes exposing (manifest)
@@ -14,6 +15,10 @@ import Spa.Generated.Route as Route
 import Spa.Page as Page exposing (Page)
 import Spa.Url exposing (Url)
 import UI.Colors as Colors
+
+import Manifest.Color as Color
+import Manifest.Display as Display
+import Manifest.Orientation as Orientation
 
 
 page : Page Params Model Msg
@@ -164,4 +169,41 @@ viewManifestList manifests =
 
 viewManifest : Manifest -> Element Msg
 viewManifest manifest =
-    row [] [ text manifest.shortName ]
+    row [ spacing 20
+        , padding 10
+        , width fill
+        ]
+        [ column []
+            [ image [ width (Element.px 24)]
+                { src = "../public/images/badge-outline-colored.svg"
+                , description = "App Icon goes here"
+                } ]
+        , column [ width fill ]
+            [ link
+                []
+                { url = Route.toString (Route.Preview__AppShortName_String {appShortName = manifest.shortName })
+                , label = text manifest.name
+                }
+            ]
+        , column [ Background.color (viewColor manifest.backgroundColor)
+                 , width (Element.px 24)
+                 , height (Element.px 24)
+                 ]
+            []
+        , column [ Background.color (viewColor manifest.themeColor)
+                 , width (Element.px 24)
+                 , height (Element.px 24)
+                 ]
+            []
+
+        , column []
+            [ text (Display.displayToString manifest.display) ]
+        , column []
+            [ text (Orientation.orientationToString manifest.orientation) ]
+        ]
+
+viewColor : String -> Color
+viewColor colorString =
+    case Color.fromHex colorString of
+        Just color -> color
+        Nothing    -> Colors.white
