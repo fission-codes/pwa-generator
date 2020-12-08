@@ -1,5 +1,8 @@
 module UI.Colors exposing
-    ( darkGray
+    ( Colors
+    , black
+    , darkGray
+    , init
     , lightGray
     , lightPurple
     , purple
@@ -7,6 +10,23 @@ module UI.Colors exposing
     )
 
 import Element exposing (Color, rgb255)
+
+
+type alias Colors =
+    { backgroundColor : Color
+    , themeColor : Color
+    , fontColor : Color
+    , themeFontColor : Color
+    }
+
+
+init : Colors
+init =
+    { backgroundColor = white
+    , themeColor = lightPurple
+    , fontColor = black
+    , themeFontColor = black
+    }
 
 
 lightPurple : Color
@@ -24,11 +44,16 @@ white =
     rgb255 255 255 255
 
 
+lightGray : Color
+lightGray =
+    rgb255 200 200 200
+
+
 darkGray : Color
 darkGray =
     rgb255 50 50 50
 
 
-lightGray : Color
-lightGray =
-    rgb255 200 200 200
+black : Color
+black =
+    rgb255 0 0 0

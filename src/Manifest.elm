@@ -88,7 +88,7 @@ placeholders =
         "/"
         "/"
         "#ffffff"
-        "#dd1111"
+        "#cd0a0a"
         Display.init
         Orientation.init
         []
@@ -99,8 +99,8 @@ placeholders =
         "hr"
         "/"
         "/"
-        "#000000"
-        "#ffffff"
+        "#9cc3d5"
+        "#0063b2"
         Display.init
         Orientation.init
         [ Icon.placeholder ]
@@ -111,8 +111,8 @@ placeholders =
         "gu"
         "/"
         "/"
-        "#111111"
-        "#2222ee"
+        "#000"
+        "#603f83"
         Display.init
         Orientation.init
         [ Icon.placeholder, Icon.placeholder ]

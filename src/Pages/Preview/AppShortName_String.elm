@@ -2,9 +2,11 @@ module Pages.Preview.AppShortName_String exposing (Model, Msg, Params, page)
 
 import Components.ManifestViewer as ManifestViewer exposing (ManifestViewer)
 import Element exposing (..)
+import Element.Background as Background
 import Element.Border as Border
 import Element.Font as Font
 import Manifest exposing (Manifest)
+import Manifest.Color
 import Material.Icons.Outlined as MaterialIcons
 import Material.Icons.Types exposing (Coloring(..))
 import Session exposing (Session)
@@ -13,7 +15,8 @@ import Spa.Document exposing (Document)
 import Spa.Generated.Route as Route
 import Spa.Page as Page exposing (Page)
 import Spa.Url as Url exposing (Url)
-import UI.Colors as Colors
+import Task
+import UI.Colors as Colors exposing (Colors)
 
 
 page : Page Params Model Msg
@@ -40,7 +43,7 @@ type alias Model =
     { session : Session
     , device : Device
     , appShortName : String
-    , manifest : Maybe Manifest
+    , colors : Colors
     }
 
 
@@ -52,13 +55,30 @@ init shared { params } =
                 List.filter
                     (\manifest -> manifest.shortName == params.appShortName)
                     shared.manifests
+
+        colors =
+            case maybeManifest of
+                Just manifest ->
+                    { backgroundColor =
+                        Maybe.withDefault Colors.lightPurple <|
+                            Manifest.Color.fromHex manifest.backgroundColor
+                    , themeColor =
+                        Maybe.withDefault Colors.lightPurple <|
+                            Manifest.Color.fromHex manifest.themeColor
+                    , fontColor = Manifest.Color.contrast manifest.backgroundColor
+                    , themeFontColor = Manifest.Color.contrast manifest.themeColor
+                    }
+
+                Nothing ->
+                    Colors.init
     in
     ( { session = shared.session
       , device = shared.device
       , appShortName = params.appShortName
-      , manifest = maybeManifest
+      , colors = colors
       }
-    , Cmd.none
+      -- elm-spa needs an update to sync to Shared
+    , Task.perform (\_ -> SyncShared) (Task.succeed Nothing)
     )
 
 
@@ -67,19 +87,19 @@ init shared { params } =
 
 
 type Msg
-    = ReplaceMe
+    = SyncShared
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        ReplaceMe ->
+        SyncShared ->
             ( model, Cmd.none )
 
 
 save : Model -> Shared.Model -> Shared.Model
 save model shared =
-    shared
+    { shared | colors = model.colors }
 
 
 load : Shared.Model -> Model -> ( Model, Cmd Msg )
@@ -107,20 +127,37 @@ view model =
     , body =
         [ case model.device.class of
             Phone ->
-                column [ width fill, paddingXY 10 20 ] []
+                column
+                    [ width fill
+                    , height fill
+                    , paddingXY 10 20
+                    , Background.color model.colors.backgroundColor
+                    , Font.color model.colors.fontColor
+                    ]
+                    []
 
             Tablet ->
                 case model.device.orientation of
                     Portrait ->
-                        column [ width fill, paddingXY 10 20, spacing 20 ]
+                        column
+                            [ width fill
+                            , height fill
+                            , paddingXY 10 20
+                            , spacing 20
+                            , Background.color model.colors.backgroundColor
+                            , Font.color model.colors.fontColor
+                            ]
                             []
 
                     Landscape ->
                         column
                             [ centerX
-                            , width (px 1000)
-                            , paddingXY 0 30
+                            , width fill
+                            , height fill
+                            , paddingXY 30 30
                             , spacing 30
+                            , Background.color model.colors.backgroundColor
+                            , Font.color model.colors.fontColor
                             ]
                             []
 
@@ -128,8 +165,11 @@ view model =
                 column
                     [ centerX
                     , width (px 1000)
-                    , paddingXY 0 30
+                    , height fill
+                    , paddingXY 30 30
                     , spacing 30
+                    , Background.color model.colors.backgroundColor
+                    , Font.color model.colors.fontColor
                     ]
                     []
         ]
