@@ -125,52 +125,61 @@ view : Model -> Document Msg
 view model =
     { title = "Previewing " ++ model.appShortName
     , body =
-        [ case model.device.class of
-            Phone ->
-                column
-                    [ width fill
-                    , height fill
-                    , paddingXY 10 20
-                    , Background.color model.colors.backgroundColor
-                    , Font.color model.colors.fontColor
-                    ]
-                    []
+        [ if Session.isLoading model.session then
+            viewLoadingAnimation
 
-            Tablet ->
-                case model.device.orientation of
-                    Portrait ->
-                        column
-                            [ width fill
-                            , height fill
-                            , paddingXY 10 20
-                            , spacing 20
-                            , Background.color model.colors.backgroundColor
-                            , Font.color model.colors.fontColor
-                            ]
-                            []
+          else
+            case model.device.class of
+                Phone ->
+                    column
+                        [ width fill
+                        , height fill
+                        , paddingXY 10 20
+                        , Background.color model.colors.backgroundColor
+                        , Font.color model.colors.fontColor
+                        ]
+                        []
 
-                    Landscape ->
-                        column
-                            [ centerX
-                            , width fill
-                            , height fill
-                            , paddingXY 30 30
-                            , spacing 30
-                            , Background.color model.colors.backgroundColor
-                            , Font.color model.colors.fontColor
-                            ]
-                            []
+                Tablet ->
+                    case model.device.orientation of
+                        Portrait ->
+                            column
+                                [ width fill
+                                , height fill
+                                , paddingXY 10 20
+                                , spacing 20
+                                , Background.color model.colors.backgroundColor
+                                , Font.color model.colors.fontColor
+                                ]
+                                []
 
-            _ ->
-                column
-                    [ centerX
-                    , width (px 1000)
-                    , height fill
-                    , paddingXY 30 30
-                    , spacing 30
-                    , Background.color model.colors.backgroundColor
-                    , Font.color model.colors.fontColor
-                    ]
-                    []
+                        Landscape ->
+                            column
+                                [ centerX
+                                , width fill
+                                , height fill
+                                , paddingXY 30 30
+                                , spacing 30
+                                , Background.color model.colors.backgroundColor
+                                , Font.color model.colors.fontColor
+                                ]
+                                []
+
+                _ ->
+                    column
+                        [ centerX
+                        , width (px 1000)
+                        , height fill
+                        , paddingXY 30 30
+                        , spacing 30
+                        , Background.color model.colors.backgroundColor
+                        , Font.color model.colors.fontColor
+                        ]
+                        []
         ]
     }
+
+
+viewLoadingAnimation : Element Msg
+viewLoadingAnimation =
+    column [ width fill ] [ el [ centerX ] (text "loading") ]
