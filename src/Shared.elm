@@ -21,7 +21,7 @@ import Manifest exposing (Manifest)
 import Session exposing (Session)
 import Spa.Document exposing (Document)
 import Spa.Generated.Route as Route
-import UI.Colors as Colors
+import UI.Colors as Colors exposing (Colors)
 import UI.Fonts as Fonts
 import Url exposing (Url)
 
@@ -46,6 +46,7 @@ type alias Model =
     , session : Session
     , device : Device
     , manifests : List Manifest
+    , colors : Colors
     }
 
 
@@ -57,6 +58,7 @@ init flags url key =
         Session.loading
         (classifyDevice flags.window)
         Manifest.placeholders
+        Colors.init
     , Cmd.none
     )
 
@@ -113,15 +115,15 @@ view { page, toMsg } model =
     { title = page.title
     , body =
         [ column
-            [ spacing 20
-            , height fill
+            [ height fill
             , width fill
             ]
             [ row
                 [ width fill
                 , spacing 20
                 , paddingXY 25 30
-                , Background.color Colors.lightPurple
+                , Background.color model.colors.themeColor
+                , Font.color model.colors.themeFontColor
                 ]
                 [ link []
                     { url = Route.toString Route.Top
@@ -134,7 +136,6 @@ view { page, toMsg } model =
                             , el
                                 [ Font.size 28
                                 , Font.family Fonts.workSans
-                                , Font.color Colors.darkGray
                                 ]
                                 (text "Fission PWA Generator")
                             ]
@@ -142,7 +143,12 @@ view { page, toMsg } model =
                 , viewSignInButton
                     { session = model.session, toMsg = toMsg }
                 ]
-            , column [ width fill, height fill ] page.body
+            , column
+                [ width fill
+                , height fill
+                , Background.color model.colors.backgroundColor
+                ]
+                page.body
             ]
         ]
     }
