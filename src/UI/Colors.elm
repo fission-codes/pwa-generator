@@ -5,6 +5,8 @@ module UI.Colors exposing
     , init
     , lightGray
     , lightPurple
+    , lightestGray
+    , offWhite
     , purple
     , white
     )
@@ -42,6 +44,16 @@ purple =
 white : Color
 white =
     rgb255 255 255 255
+
+
+offWhite : Color
+offWhite =
+    rgb255 245 245 245
+
+
+lightestGray : Color
+lightestGray =
+    rgb255 235 235 235
 
 
 lightGray : Color
