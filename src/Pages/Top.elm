@@ -103,14 +103,14 @@ view model =
     , body =
         [ case model.device.class of
             Phone ->
-                column [ width fill, paddingXY 10 20 ] [ viewManifestList model.manifests ]
+                column [ width fill, paddingXY 10 20 ] [ viewManifestList model.manifests model.device ]
 
             Tablet ->
                 case model.device.orientation of
                     Portrait ->
                         column [ width fill, paddingXY 10 20, spacing 20 ]
                             [ viewEditorControls
-                            , viewManifestList model.manifests
+                            , viewManifestList model.manifests model.device
                             ]
 
                     Landscape ->
@@ -121,7 +121,7 @@ view model =
                             , spacing 30
                             ]
                             [ viewEditorControls
-                            , viewManifestList model.manifests
+                            , viewManifestList model.manifests model.device
                             ]
 
             _ ->
@@ -132,7 +132,7 @@ view model =
                     , spacing 30
                     ]
                     [ viewEditorControls
-                    , viewManifestList model.manifests
+                    , viewManifestList model.manifests model.device
                     ]
         ]
     }
@@ -155,8 +155,8 @@ viewEditorControls =
         ]
 
 
-viewManifestList : List Manifest -> Element Msg
-viewManifestList manifests =
+viewManifestList : List Manifest -> Device -> Element Msg
+viewManifestList manifests device =
     column
         [ width fill
         , spacing 5
@@ -164,11 +164,16 @@ viewManifestList manifests =
         , Border.color Colors.lightGray
         ]
     <|
-        List.map viewManifest manifests
+        List.map (viewManifest device) manifests
 
 
-viewManifest : Manifest -> Element Msg
-viewManifest manifest =
+viewManifest : Device -> Manifest -> Element Msg
+viewManifest device manifest =
+    let
+        linkUrl = case device.class of
+            Phone -> Route.toString (Route.Preview__AppShortName_String {appShortName = manifest.shortName })
+            _     -> Route.toString (Route.Edit__AppShortName_String {appShortName = manifest.shortName })
+    in
     row [ spacing 20
         , padding 10
         , width fill
@@ -181,7 +186,7 @@ viewManifest manifest =
         , column [ width fill ]
             [ link
                 []
-                { url = Route.toString (Route.Preview__AppShortName_String {appShortName = manifest.shortName })
+                { url = linkUrl
                 , label = text manifest.name
                 }
             ]
