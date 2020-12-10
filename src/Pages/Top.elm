@@ -186,11 +186,15 @@ viewManifest manifest =
                 }
             ]
         , column [ Background.color (viewColor manifest.backgroundColor)
+                 , Border.color Colors.lightGray
+                 , Border.width 1
                  , width (Element.px 24)
                  , height (Element.px 24)
                  ]
             []
         , column [ Background.color (viewColor manifest.themeColor)
+                 , Border.color Colors.lightGray
+                 , Border.width 1
                  , width (Element.px 24)
                  , height (Element.px 24)
                  ]
