@@ -1,10 +1,13 @@
 module Pages.Preview.AppShortName_String exposing (Model, Msg, Params, page)
 
-import Components.ManifestViewer as ManifestViewer exposing (ManifestViewer)
+import Api
+import Components.ManifestOutputs as ManifestOutputs
+import Components.ManifestViewer as ManifestViewer
 import Element exposing (..)
 import Element.Background as Background
 import Element.Border as Border
 import Element.Font as Font
+import Json.Encode as Encode
 import Manifest exposing (Manifest)
 import Manifest.Color
 import Material.Icons.Outlined as MaterialIcons
@@ -44,6 +47,7 @@ type alias Model =
     , device : Device
     , appShortName : String
     , colors : Colors
+    , manifest : Maybe Manifest
     }
 
 
@@ -76,6 +80,7 @@ init shared { params } =
       , device = shared.device
       , appShortName = params.appShortName
       , colors = colors
+      , manifest = maybeManifest
       }
       -- elm-spa needs an update to sync to Shared
     , Task.perform (\_ -> SyncShared) (Task.succeed Nothing)
@@ -88,6 +93,7 @@ init shared { params } =
 
 type Msg
     = SyncShared
+    | CopyToClipboard String
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -95,6 +101,11 @@ update msg model =
     case msg of
         SyncShared ->
             ( model, Cmd.none )
+
+        CopyToClipboard elemId ->
+            ( model
+            , Api.copyToClipboard (Encode.string elemId)
+            )
 
 
 save : Model -> Shared.Model -> Shared.Model
@@ -125,52 +136,99 @@ view : Model -> Document Msg
 view model =
     { title = "Previewing " ++ model.appShortName
     , body =
-        [ case model.device.class of
-            Phone ->
-                column
-                    [ width fill
-                    , height fill
-                    , paddingXY 10 20
-                    , Background.color model.colors.backgroundColor
-                    , Font.color model.colors.fontColor
-                    ]
-                    []
+        [ if Session.isLoading model.session then
+            viewLoadingAnimation
 
-            Tablet ->
-                case model.device.orientation of
-                    Portrait ->
-                        column
-                            [ width fill
-                            , height fill
-                            , paddingXY 10 20
-                            , spacing 20
-                            , Background.color model.colors.backgroundColor
-                            , Font.color model.colors.fontColor
-                            ]
-                            []
+          else
+            case model.device.class of
+                Phone ->
+                    column
+                        [ width fill
+                        , height fill
+                        , paddingXY 10 20
+                        , Background.color model.colors.backgroundColor
+                        , Font.color model.colors.fontColor
+                        ]
+                    <|
+                        case model.manifest of
+                            Just manifest ->
+                                [ ManifestViewer.view manifest ]
 
-                    Landscape ->
-                        column
-                            [ centerX
-                            , width fill
-                            , height fill
-                            , paddingXY 30 30
-                            , spacing 30
-                            , Background.color model.colors.backgroundColor
-                            , Font.color model.colors.fontColor
-                            ]
-                            []
+                            Nothing ->
+                                [ none ]
 
-            _ ->
-                column
-                    [ centerX
-                    , width (px 1000)
-                    , height fill
-                    , paddingXY 30 30
-                    , spacing 30
-                    , Background.color model.colors.backgroundColor
-                    , Font.color model.colors.fontColor
-                    ]
-                    []
+                Tablet ->
+                    case model.device.orientation of
+                        Portrait ->
+                            column
+                                [ width fill
+                                , height fill
+                                , paddingXY 10 20
+                                , spacing 20
+                                , Background.color model.colors.backgroundColor
+                                , Font.color model.colors.fontColor
+                                ]
+                            <|
+                                case model.manifest of
+                                    Just manifest ->
+                                        [ ManifestViewer.view manifest ]
+
+                                    Nothing ->
+                                        [ none ]
+
+                        Landscape ->
+                            column
+                                [ centerX
+                                , width fill
+                                , height fill
+                                , paddingXY 30 30
+                                , spacing 30
+                                , Background.color model.colors.backgroundColor
+                                , Font.color model.colors.fontColor
+                                ]
+                            <|
+                                case model.manifest of
+                                    Just manifest ->
+                                        [ row [ width fill, spacing 25 ]
+                                            [ ManifestViewer.view manifest
+                                            , ManifestOutputs.view
+                                                { manifest = manifest
+                                                , onCopyToClipboard = CopyToClipboard
+                                                }
+                                            ]
+                                        ]
+
+                                    Nothing ->
+                                        [ none ]
+
+                _ ->
+                    column
+                        [ centerX
+                        , width (px 1000)
+                        , height fill
+                        , paddingXY 30 30
+                        , spacing 30
+                        , Background.color model.colors.backgroundColor
+                        , Font.color model.colors.fontColor
+                        ]
+                    <|
+                        case model.manifest of
+                            Just manifest ->
+                                [ row [ width fill, spacing 25 ]
+                                    [ ManifestViewer.view manifest
+                                    , ManifestOutputs.view
+                                        { manifest = manifest
+                                        , onCopyToClipboard = CopyToClipboard
+                                        }
+                                    ]
+                                ]
+
+                            Nothing ->
+                                [ none ]
         ]
     }
+
+
+viewLoadingAnimation : Element Msg
+viewLoadingAnimation =
+    column [ width fill ] [ el [ centerX ] (text "loading") ]

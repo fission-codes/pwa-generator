@@ -1,4 +1,4 @@
-port module Api exposing (login, viewerChanges)
+port module Api exposing (copyToClipboard, login, viewerChanges)
 
 import Json.Decode as Decode exposing (Decoder)
 import Json.Encode as Encode exposing (Value)
@@ -22,3 +22,6 @@ viewerChanges toMsg decoder =
                 |> Result.toMaybe
                 |> toMsg
         )
+
+
+port copyToClipboard : Value -> Cmd msg

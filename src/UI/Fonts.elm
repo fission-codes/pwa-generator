@@ -1,4 +1,4 @@
-module UI.Fonts exposing (karla, workSans)
+module UI.Fonts exposing (cousine, karla, workSans)
 
 import Element.Font as Font
 
@@ -6,7 +6,7 @@ import Element.Font as Font
 karla : List Font.Font
 karla =
     [ Font.external
-        { url = "https://fonts.googleapis.com/css2?family=Karla&display=swap"
+        { url = "https://fonts.googleapis.com/css2?family=Karla:wght@400;600&display=swap"
         , name = "Karla"
         }
     , Font.serif
@@ -20,4 +20,14 @@ workSans =
         , name = "Work Sans"
         }
     , Font.sansSerif
+    ]
+
+
+cousine : List Font.Font
+cousine =
+    [ Font.external
+        { url = "https://fonts.googleapis.com/css2?family=Cousine&display=swap"
+        , name = "Cousine"
+        }
+    , Font.monospace
     ]
