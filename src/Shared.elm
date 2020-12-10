@@ -16,7 +16,7 @@ import Element.Background as Background
 import Element.Border as Border
 import Element.Font as Font
 import Element.Input as Input
-import Html.Attributes exposing (class)
+import Html.Attributes
 import Manifest exposing (Manifest)
 import Session exposing (Session)
 import Spa.Document exposing (Document)
@@ -124,6 +124,7 @@ view { page, toMsg } model =
                 , paddingXY 25 30
                 , Background.color model.colors.themeColor
                 , Font.color model.colors.themeFontColor
+                , htmlAttribute (Html.Attributes.class "adaptive-color")
                 ]
                 [ link []
                     { url = Route.toString Route.Top
@@ -147,6 +148,7 @@ view { page, toMsg } model =
                 [ width fill
                 , height fill
                 , Background.color model.colors.backgroundColor
+                , htmlAttribute (Html.Attributes.class "adaptive-color")
                 ]
                 page.body
             ]

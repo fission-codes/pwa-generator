@@ -1,0 +1,3 @@
+.adaptive-color {
+  transition: color ease 1s, background-color ease 1s;
+}
