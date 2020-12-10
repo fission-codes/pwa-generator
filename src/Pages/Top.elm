@@ -6,6 +6,9 @@ import Element.Border as Border
 import Element.Font as Font
 import Html.Attributes exposing (manifest)
 import Manifest exposing (Manifest)
+import Manifest.Color as Color
+import Manifest.Display as Display
+import Manifest.Orientation as Orientation
 import Material.Icons.Outlined as MaterialIcons
 import Material.Icons.Types exposing (Coloring(..))
 import Session exposing (Session)
@@ -15,10 +18,6 @@ import Spa.Generated.Route as Route
 import Spa.Page as Page exposing (Page)
 import Spa.Url exposing (Url)
 import UI.Colors as Colors
-
-import Manifest.Color as Color
-import Manifest.Display as Display
-import Manifest.Orientation as Orientation
 
 
 page : Page Params Model Msg
@@ -170,19 +169,25 @@ viewManifestList manifests device =
 viewManifest : Device -> Manifest -> Element Msg
 viewManifest device manifest =
     let
-        linkUrl = case device.class of
-            Phone -> Route.toString (Route.Preview__AppShortName_String {appShortName = manifest.shortName })
-            _     -> Route.toString (Route.Edit__AppShortName_String {appShortName = manifest.shortName })
+        linkUrl =
+            case device.class of
+                Phone ->
+                    Route.toString (Route.Preview__AppShortName_String { appShortName = manifest.shortName })
+
+                _ ->
+                    Route.toString (Route.Edit__AppShortName_String { appShortName = manifest.shortName })
     in
-    row [ spacing 20
+    row
+        [ spacing 20
         , padding 10
         , width fill
         ]
         [ column []
-            [ image [ width (Element.px 24)]
+            [ image [ width (Element.px 24) ]
                 { src = "../public/images/badge-outline-colored.svg"
                 , description = "App Icon goes here"
-                } ]
+                }
+            ]
         , column [ width fill ]
             [ link
                 []
@@ -190,29 +195,34 @@ viewManifest device manifest =
                 , label = text manifest.name
                 }
             ]
-        , column [ Background.color (viewColor manifest.backgroundColor)
-                 , Border.color Colors.lightGray
-                 , Border.width 1
-                 , width (Element.px 24)
-                 , height (Element.px 24)
-                 ]
+        , column
+            [ Background.color (viewColor manifest.backgroundColor)
+            , Border.color Colors.lightGray
+            , Border.width 1
+            , width (Element.px 24)
+            , height (Element.px 24)
+            ]
             []
-        , column [ Background.color (viewColor manifest.themeColor)
-                 , Border.color Colors.lightGray
-                 , Border.width 1
-                 , width (Element.px 24)
-                 , height (Element.px 24)
-                 ]
+        , column
+            [ Background.color (viewColor manifest.themeColor)
+            , Border.color Colors.lightGray
+            , Border.width 1
+            , width (Element.px 24)
+            , height (Element.px 24)
+            ]
             []
-
         , column []
             [ text (Display.displayToString manifest.display) ]
         , column []
             [ text (Orientation.orientationToString manifest.orientation) ]
         ]
 
+
 viewColor : String -> Color
 viewColor colorString =
     case Color.fromHex colorString of
-        Just color -> color
-        Nothing    -> Colors.white
+        Just color ->
+            color
+
+        Nothing ->
+            Colors.white
