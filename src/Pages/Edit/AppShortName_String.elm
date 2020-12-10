@@ -1,7 +1,7 @@
 module Pages.Edit.AppShortName_String exposing (Model, Msg, Params, page)
 
 import Components.ManifestEditor as ManifestEditor exposing (ManifestEditor)
-import Components.ManifestViewer as ManifestViewer exposing (ManifestViewer)
+import Components.ManifestViewer as ManifestViewer
 import Element exposing (..)
 import Element.Border as Border
 import Element.Font as Font

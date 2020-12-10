@@ -55,3 +55,24 @@ webnative.initialize(fissionInit).then(async state => {
     webnative.redirectToLobby(state.permissions);
   });
 });
+
+
+
+// CLIPBOARD
+
+app.ports.copyToClipboard.subscribe(async id => {
+  const el = await document.getElementById(id);
+
+  // create range over node
+  const range = document.createRange();
+  range.selectNodeContents(el);
+
+  // get selection, clear and replace from range
+  const selection = window.getSelection();
+  selection.removeAllRanges();
+  selection.addRange(range);
+
+  // copy selection to clipboard, then clear it
+  document.execCommand("copy");
+  selection.removeAllRanges();
+});

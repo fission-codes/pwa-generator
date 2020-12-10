@@ -1,10 +1,13 @@
 module Pages.Preview.AppShortName_String exposing (Model, Msg, Params, page)
 
-import Components.ManifestViewer as ManifestViewer exposing (ManifestViewer)
+import Api
+import Components.ManifestOutputs as ManifestOutputs
+import Components.ManifestViewer as ManifestViewer
 import Element exposing (..)
 import Element.Background as Background
 import Element.Border as Border
 import Element.Font as Font
+import Json.Encode as Encode
 import Manifest exposing (Manifest)
 import Manifest.Color
 import Material.Icons.Outlined as MaterialIcons
@@ -44,6 +47,7 @@ type alias Model =
     , device : Device
     , appShortName : String
     , colors : Colors
+    , manifest : Maybe Manifest
     }
 
 
@@ -76,6 +80,7 @@ init shared { params } =
       , device = shared.device
       , appShortName = params.appShortName
       , colors = colors
+      , manifest = maybeManifest
       }
       -- elm-spa needs an update to sync to Shared
     , Task.perform (\_ -> SyncShared) (Task.succeed Nothing)
@@ -88,6 +93,7 @@ init shared { params } =
 
 type Msg
     = SyncShared
+    | CopyToClipboard String
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -95,6 +101,11 @@ update msg model =
     case msg of
         SyncShared ->
             ( model, Cmd.none )
+
+        CopyToClipboard elemId ->
+            ( model
+            , Api.copyToClipboard (Encode.string elemId)
+            )
 
 
 save : Model -> Shared.Model -> Shared.Model
@@ -138,7 +149,13 @@ view model =
                         , Background.color model.colors.backgroundColor
                         , Font.color model.colors.fontColor
                         ]
-                        []
+                    <|
+                        case model.manifest of
+                            Just manifest ->
+                                [ ManifestViewer.view manifest ]
+
+                            Nothing ->
+                                [ none ]
 
                 Tablet ->
                     case model.device.orientation of
@@ -151,7 +168,13 @@ view model =
                                 , Background.color model.colors.backgroundColor
                                 , Font.color model.colors.fontColor
                                 ]
-                                []
+                            <|
+                                case model.manifest of
+                                    Just manifest ->
+                                        [ ManifestViewer.view manifest ]
+
+                                    Nothing ->
+                                        [ none ]
 
                         Landscape ->
                             column
@@ -163,7 +186,20 @@ view model =
                                 , Background.color model.colors.backgroundColor
                                 , Font.color model.colors.fontColor
                                 ]
-                                []
+                            <|
+                                case model.manifest of
+                                    Just manifest ->
+                                        [ row [ width fill, spacing 25 ]
+                                            [ ManifestViewer.view manifest
+                                            , ManifestOutputs.view
+                                                { manifest = manifest
+                                                , onCopyToClipboard = CopyToClipboard
+                                                }
+                                            ]
+                                        ]
+
+                                    Nothing ->
+                                        [ none ]
 
                 _ ->
                     column
@@ -175,7 +211,20 @@ view model =
                         , Background.color model.colors.backgroundColor
                         , Font.color model.colors.fontColor
                         ]
-                        []
+                    <|
+                        case model.manifest of
+                            Just manifest ->
+                                [ row [ width fill, spacing 25 ]
+                                    [ ManifestViewer.view manifest
+                                    , ManifestOutputs.view
+                                        { manifest = manifest
+                                        , onCopyToClipboard = CopyToClipboard
+                                        }
+                                    ]
+                                ]
+
+                            Nothing ->
+                                [ none ]
         ]
     }
 
