@@ -150,13 +150,15 @@ view model =
                         [ width fill
                         , height fill
                         , paddingXY 10 20
-                        , Background.color model.colors.backgroundColor
-                        , Font.color model.colors.fontColor
                         ]
                     <|
                         case model.manifest of
                             Just manifest ->
-                                [ ManifestViewer.view manifest ]
+                                [ ManifestViewer.view
+                                    { manifest = manifest
+                                    , fontColor = model.colors.fontColor
+                                    }
+                                ]
 
                             Nothing ->
                                 [ none ]
@@ -169,13 +171,15 @@ view model =
                                 , height fill
                                 , paddingXY 10 20
                                 , spacing 20
-                                , Background.color model.colors.backgroundColor
-                                , Font.color model.colors.fontColor
                                 ]
                             <|
                                 case model.manifest of
                                     Just manifest ->
-                                        [ ManifestViewer.view manifest ]
+                                        [ ManifestViewer.view
+                                            { manifest = manifest
+                                            , fontColor = model.colors.fontColor
+                                            }
+                                        ]
 
                                     Nothing ->
                                         [ none ]
@@ -187,14 +191,15 @@ view model =
                                 , height fill
                                 , paddingXY 30 30
                                 , spacing 30
-                                , Background.color model.colors.backgroundColor
-                                , Font.color model.colors.fontColor
                                 ]
                             <|
                                 case model.manifest of
                                     Just manifest ->
                                         [ row [ width fill, spacing 25 ]
-                                            [ ManifestViewer.view manifest
+                                            [ ManifestViewer.view
+                                                { manifest = manifest
+                                                , fontColor = model.colors.fontColor
+                                                }
                                             , ManifestOutputs.view
                                                 { manifest = manifest
                                                 , onCopyToClipboard = CopyToClipboard
@@ -212,14 +217,15 @@ view model =
                         , height fill
                         , paddingXY 30 30
                         , spacing 30
-                        , Background.color model.colors.backgroundColor
-                        , Font.color model.colors.fontColor
                         ]
                     <|
                         case model.manifest of
                             Just manifest ->
                                 [ row [ width fill, spacing 25 ]
-                                    [ ManifestViewer.view manifest
+                                    [ ManifestViewer.view
+                                        { manifest = manifest
+                                        , fontColor = model.colors.fontColor
+                                        }
                                     , ManifestOutputs.view
                                         { manifest = manifest
                                         , onCopyToClipboard = CopyToClipboard

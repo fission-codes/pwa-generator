@@ -15,13 +15,18 @@ import UI.Colors as Colors
 import UI.Fonts as Fonts
 
 
-view : Manifest -> Element msg
-view manifest =
+view :
+    { manifest : Manifest
+    , fontColor : Color
+    }
+    -> Element msg
+view { manifest, fontColor } =
     column
         [ alignTop
         , width fill
         , padding 10
         , spacing 25
+        , Font.color fontColor
         ]
         [ row [ spacing 15 ]
             [ viewIcon { name = manifest.name, icons = manifest.icons }

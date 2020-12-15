@@ -265,7 +265,10 @@ view model =
                                                     }
 
                                             NotEditing ->
-                                                ManifestViewer.view manifest
+                                                ManifestViewer.view
+                                                    { manifest = manifest
+                                                    , fontColor = model.colors.fontColor
+                                                    }
                                         , ManifestOutputs.view
                                             { manifest = manifest
                                             , onCopyToClipboard = CopyToClipboard
@@ -302,7 +305,10 @@ view model =
                                             }
 
                                     NotEditing ->
-                                        ManifestViewer.view manifest
+                                        ManifestViewer.view
+                                            { manifest = manifest
+                                            , fontColor = model.colors.fontColor
+                                            }
                                 , ManifestOutputs.view
                                     { manifest = manifest
                                     , onCopyToClipboard = CopyToClipboard
