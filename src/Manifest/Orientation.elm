@@ -2,6 +2,7 @@ module Manifest.Orientation exposing
     ( Orientation
     , decoder
     , encode
+    , fromString
     , init
     , orientationToString
     )
@@ -24,6 +25,37 @@ type Orientation
 init : Orientation
 init =
     Natural
+
+
+fromString : String -> Maybe Orientation
+fromString str =
+    case str of
+        "any" ->
+            Just Any
+
+        "natural" ->
+            Just Natural
+
+        "landscape" ->
+            Just Landscape
+
+        "portrait" ->
+            Just Portrait
+
+        "portrait-primary" ->
+            Just PortraitPrimary
+
+        "portrait-secondary" ->
+            Just PortraitSecondary
+
+        "landscape-primary" ->
+            Just LandscapePrimary
+
+        "landscape-secondary" ->
+            Just LandscapeSecondary
+
+        _ ->
+            Nothing
 
 
 decoder : Decoder Orientation
