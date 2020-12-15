@@ -97,8 +97,12 @@ updateColors currentColors manifest =
     , themeColor =
         Maybe.withDefault currentColors.themeColor <|
             Manifest.Color.fromHex manifest.themeColor
-    , fontColor = Manifest.Color.contrast manifest.backgroundColor
-    , themeFontColor = Manifest.Color.contrast manifest.themeColor
+    , fontColor =
+        Maybe.withDefault currentColors.fontColor <|
+            Manifest.Color.contrast manifest.backgroundColor
+    , themeFontColor =
+        Maybe.withDefault currentColors.themeFontColor <|
+            Manifest.Color.contrast manifest.themeColor
     }
 
 
@@ -150,7 +154,7 @@ view model =
                             , paddingXY 0 30
                             , spacing 30
                             ]
-                            [ viewEditorControls model.manifest
+                            [ viewEditorControls model.colors
                             , row [ width fill, spacing 30 ]
                                 [ ManifestEditor.view
                                     { manifest = model.manifest
@@ -172,7 +176,7 @@ view model =
                     , paddingXY 0 30
                     , spacing 30
                     ]
-                    [ viewEditorControls model.manifest
+                    [ viewEditorControls model.colors
                     , row [ width fill, spacing 30 ]
                         [ ManifestEditor.view
                             { manifest = model.manifest
@@ -190,21 +194,21 @@ view model =
     }
 
 
-viewEditorControls : Manifest -> Element Msg
-viewEditorControls manifest =
+viewEditorControls : Colors -> Element Msg
+viewEditorControls colors =
     row
         [ width fill
         , Border.width 1
         , Border.color Colors.lightGray
         ]
         [ row [ alignRight, spacing 5, Font.color Colors.darkGray ]
-            [ el [ Font.color (Manifest.Color.contrast manifest.backgroundColor) ] <|
+            [ el [ Font.color colors.fontColor ] <|
                 html <|
                     MaterialIcons.save 28 Inherit
             , link []
                 { url = Route.toString Route.Top
                 , label =
-                    el [ Font.color (Manifest.Color.contrast manifest.backgroundColor) ] <|
+                    el [ Font.color colors.fontColor ] <|
                         html <|
                             MaterialIcons.delete 28 Inherit
                 }
