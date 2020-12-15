@@ -69,8 +69,12 @@ init shared { params } =
                     , themeColor =
                         Maybe.withDefault Colors.lightPurple <|
                             Manifest.Color.fromHex manifest.themeColor
-                    , fontColor = Manifest.Color.contrast manifest.backgroundColor
-                    , themeFontColor = Manifest.Color.contrast manifest.themeColor
+                    , fontColor =
+                        Maybe.withDefault Colors.black <|
+                            Manifest.Color.contrast manifest.backgroundColor
+                    , themeFontColor =
+                        Maybe.withDefault Colors.black <|
+                            Manifest.Color.contrast manifest.themeColor
                     }
 
                 Nothing ->

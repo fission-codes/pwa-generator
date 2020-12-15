@@ -3,6 +3,7 @@ module Manifest.Display exposing
     , decoder
     , displayToString
     , encode
+    , fromString
     , init
     )
 
@@ -20,6 +21,25 @@ type Display
 init : Display
 init =
     Standalone
+
+
+fromString : String -> Maybe Display
+fromString str =
+    case str of
+        "fullscreen" ->
+            Just Fullscreen
+
+        "standalone" ->
+            Just Standalone
+
+        "minimal-ui" ->
+            Just MinimalUI
+
+        "browser" ->
+            Just Browser
+
+        _ ->
+            Nothing
 
 
 decoder : Decoder Display

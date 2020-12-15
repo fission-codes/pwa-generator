@@ -4,6 +4,7 @@ import Char exposing (isHexDigit)
 import Element exposing (Color, rgba255)
 import Hex
 import Parser exposing (..)
+import UI.Colors as Colors
 
 
 type alias ColorSpace =
@@ -26,18 +27,18 @@ It might also be worth implementing the W3C spec recommendations at
 <https://www.w3.org/TR/WCAG20/#contrast-ratiodef>.
 
 -}
-contrast : String -> Color
+contrast : String -> Maybe Color
 contrast hexString =
     case Parser.run hexColor hexString of
         Ok colorSpace ->
-            if brightness colorSpace > 186 then
-                rgba255 0 0 0 1
+            if brightness colorSpace > 150 then
+                Just Colors.black
 
             else
-                rgba255 255 255 255 1
+                Just Colors.white
 
         Err err ->
-            rgba255 0 0 0 1
+            Nothing
 
 
 brightness : ColorSpace -> Float
