@@ -25,7 +25,7 @@ view :
     }
     -> Element msg
 view options =
-    column [ width fill, paddingXY 10 20, spacing 20 ]
+    column [ alignTop, width fill, paddingXY 10 20, spacing 20 ]
         [ viewManifest options
         , viewHtmlHead options
         ]
@@ -77,7 +77,7 @@ viewManifest { manifest, onCopyToClipboard } =
     in
     column
         [ width (px 480)
-        , height (px 480)
+        , height (px 420)
         , paddingXY 15 20
         , spacing 20
         , scrollbars
@@ -200,7 +200,7 @@ viewHtmlHead :
 viewHtmlHead { manifest, onCopyToClipboard } =
     column
         [ width (px 480)
-        , height (px 480)
+        , height (px 420)
         , paddingXY 15 20
         , spacing 20
         , scrollbars
