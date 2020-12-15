@@ -16,6 +16,7 @@ import Spa.Document exposing (Document)
 import Spa.Generated.Route as Route
 import Spa.Page as Page exposing (Page)
 import Spa.Url as Url exposing (Url)
+import Task
 import UI.Colors as Colors exposing (Colors)
 
 
@@ -63,16 +64,41 @@ init shared { params } =
                 List.filter
                     (\manifest -> manifest.shortName == params.appShortName)
                     shared.manifests
+
+        colors =
+            case maybeManifest of
+                Just manifest ->
+                    let
+                        dbg =
+                            Debug.log "manifest" manifest
+                    in
+                    { backgroundColor =
+                        Maybe.withDefault Colors.lightPurple <|
+                            Manifest.Color.fromHex manifest.backgroundColor
+                    , themeColor =
+                        Maybe.withDefault Colors.lightPurple <|
+                            Manifest.Color.fromHex manifest.themeColor
+                    , fontColor =
+                        Maybe.withDefault Colors.black <|
+                            Manifest.Color.contrast manifest.backgroundColor
+                    , themeFontColor =
+                        Maybe.withDefault Colors.black <|
+                            Manifest.Color.contrast manifest.themeColor
+                    }
+
+                Nothing ->
+                    Colors.init
     in
     ( { session = shared.session
       , device = shared.device
       , appShortName = params.appShortName
       , manifest = maybeManifest
       , editMode = NotEditing
-      , colors = Colors.init
+      , colors = colors
       , problems = []
       }
-    , Cmd.none
+      -- elm-spa needs an update to sync to Shared
+    , Task.perform (\_ -> SyncShared) (Task.succeed Nothing)
     )
 
 
@@ -84,6 +110,7 @@ type Msg
     = Save Manifest
     | Edit
     | Delete Manifest
+    | SyncShared
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -106,10 +133,13 @@ update msg model =
         Delete manifest ->
             ( model, Cmd.none )
 
+        SyncShared ->
+            ( model, Cmd.none )
+
 
 save : Model -> Shared.Model -> Shared.Model
 save model shared =
-    shared
+    { shared | colors = model.colors }
 
 
 {-| We want to load the manifest once after the user authenticates.
