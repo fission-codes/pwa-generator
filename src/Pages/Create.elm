@@ -1,10 +1,12 @@
 module Pages.Create exposing (Model, Msg, Params, page)
 
 import Api
+import Browser.Navigation exposing (Key)
 import Components.ManifestEditor as ManifestEditor exposing (Problem)
 import Components.ManifestOutputs as ManifestOutputs
 import Element exposing (..)
 import Element.Border as Border
+import Element.Events as Events
 import Element.Font as Font
 import Html.Attributes exposing (manifest)
 import Json.Encode as Encode
@@ -43,6 +45,7 @@ type alias Params =
 
 type alias Model =
     { session : Session
+    , key : Key
     , device : Device
     , manifest : Manifest
     , colors : Colors
@@ -53,6 +56,7 @@ type alias Model =
 init : Shared.Model -> Url Params -> ( Model, Cmd Msg )
 init shared { params } =
     ( { session = shared.session
+      , key = shared.key
       , device = shared.device
       , manifest = Manifest.init
       , colors = Colors.init
@@ -69,6 +73,8 @@ init shared { params } =
 type Msg
     = UpdateManifest (List Problem) Manifest
     | CopyToClipboard String
+    | Save Manifest
+    | Cancel
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -86,6 +92,16 @@ update msg model =
         CopyToClipboard elemId ->
             ( model
             , Api.copyToClipboard (Encode.string elemId)
+            )
+
+        Save manifest ->
+            ( model
+            , Cmd.none
+            )
+
+        Cancel ->
+            ( model
+            , Browser.Navigation.replaceUrl model.key (Route.toString Route.Top)
             )
 
 
@@ -154,7 +170,11 @@ view model =
                             , paddingXY 0 30
                             , spacing 30
                             ]
-                            [ viewEditorControls model.colors
+                            [ viewEditorControls
+                                { manifest = model.manifest
+                                , problems = model.problems
+                                , colors = model.colors
+                                }
                             , row [ width fill, spacing 30 ]
                                 [ ManifestEditor.view
                                     { manifest = model.manifest
@@ -174,9 +194,12 @@ view model =
                     [ centerX
                     , width (px 1000)
                     , paddingXY 0 30
-                    , spacing 30
                     ]
-                    [ viewEditorControls model.colors
+                    [ viewEditorControls
+                        { manifest = model.manifest
+                        , problems = model.problems
+                        , colors = model.colors
+                        }
                     , row [ width fill, spacing 30 ]
                         [ ManifestEditor.view
                             { manifest = model.manifest
@@ -194,23 +217,25 @@ view model =
     }
 
 
-viewEditorControls : Colors -> Element Msg
-viewEditorControls colors =
+viewEditorControls :
+    { manifest : Manifest
+    , problems : List Problem
+    , colors : Colors
+    }
+    -> Element Msg
+viewEditorControls { manifest, problems, colors } =
     row
-        [ width fill
-        , Border.width 1
-        , Border.color Colors.lightGray
-        ]
+        [ width fill ]
         [ row [ alignRight, spacing 5, Font.color Colors.darkGray ]
-            [ el [ Font.color colors.fontColor ] <|
+            [ if List.isEmpty problems then
+                el [ Events.onClick (Save manifest), Font.color colors.fontColor ] <|
+                    html <|
+                        MaterialIcons.save 30 Inherit
+
+              else
+                none
+            , el [ Events.onClick Cancel, Font.color colors.fontColor ] <|
                 html <|
-                    MaterialIcons.save 28 Inherit
-            , link []
-                { url = Route.toString Route.Top
-                , label =
-                    el [ Font.color colors.fontColor ] <|
-                        html <|
-                            MaterialIcons.delete 28 Inherit
-                }
+                    MaterialIcons.delete 30 Inherit
             ]
         ]
