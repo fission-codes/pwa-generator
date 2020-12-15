@@ -405,7 +405,7 @@ viewOrientation options =
                     , { label = "Landscape Primary", value = "landscape-primary" }
                     , { label = "Landscape Secondary", value = "landscape-secondary" }
                     ]
-            , selected = Just (Orientation.orientationToString options.selected)
+            , selected = Just (Orientation.toString options.selected)
             , label =
                 Input.labelAbove
                     [ Font.size 18
@@ -440,7 +440,7 @@ viewDisplay options =
                     , { label = "Minimal-UI", value = "minimal-ui" }
                     , { label = "Browser", value = "browser" }
                     ]
-            , selected = Just (Display.displayToString options.selected)
+            , selected = Just (Display.toString options.selected)
             , label =
                 Input.labelAbove
                     [ Font.size 18

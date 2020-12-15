@@ -212,9 +212,9 @@ viewManifest device manifest =
             ]
             []
         , column []
-            [ text (Display.displayToString manifest.display) ]
+            [ text (Display.toString manifest.display) ]
         , column []
-            [ text (Orientation.orientationToString manifest.orientation) ]
+            [ text (Orientation.toString manifest.orientation) ]
         ]
 
 

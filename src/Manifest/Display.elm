@@ -1,10 +1,10 @@
 module Manifest.Display exposing
     ( Display
     , decoder
-    , displayToString
     , encode
     , fromString
     , init
+    , toString
     )
 
 import Json.Decode as Decode exposing (Decoder)
@@ -67,11 +67,11 @@ decoder =
 
 encode : Display -> Value
 encode display =
-    Encode.string (displayToString display)
+    Encode.string (toString display)
 
 
-displayToString : Display -> String
-displayToString display =
+toString : Display -> String
+toString display =
     case display of
         Fullscreen ->
             "fullscreen"

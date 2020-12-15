@@ -51,11 +51,11 @@ view { manifest, fontColor } =
                 ]
             , paragraph []
                 [ el [ Font.semiBold ] (text "Display: ")
-                , text (Display.displayToString manifest.display)
+                , text (Display.toString manifest.display)
                 ]
             , paragraph []
                 [ el [ Font.semiBold ] (text "Orientation: ")
-                , text (Orientation.orientationToString manifest.orientation)
+                , text (Orientation.toString manifest.orientation)
                 ]
             , paragraph []
                 [ el [ Font.semiBold ] (text "Start URL: ")

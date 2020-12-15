@@ -68,10 +68,10 @@ viewManifest { manifest, onCopyToClipboard } =
               , value = manifest.themeColor
               }
             , { name = "display"
-              , value = Display.displayToString manifest.display
+              , value = Display.toString manifest.display
               }
             , { name = "orientation"
-              , value = Orientation.orientationToString manifest.orientation
+              , value = Orientation.toString manifest.orientation
               }
             ]
     in

@@ -4,7 +4,7 @@ module Manifest.Orientation exposing
     , encode
     , fromString
     , init
-    , orientationToString
+    , toString
     )
 
 import Json.Decode as Decode exposing (Decoder)
@@ -95,11 +95,11 @@ decoder =
 
 encode : Orientation -> Value
 encode orientation =
-    Encode.string (orientationToString orientation)
+    Encode.string (toString orientation)
 
 
-orientationToString : Orientation -> String
-orientationToString orientation =
+toString : Orientation -> String
+toString orientation =
     case orientation of
         Any ->
             "any"
