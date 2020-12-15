@@ -1,11 +1,15 @@
 module Pages.Edit.AppShortName_String exposing (Model, Msg, Params, page)
 
+import Api
 import Components.ManifestEditor as ManifestEditor exposing (Problem)
+import Components.ManifestOutputs as ManifestOutputs
 import Components.ManifestViewer as ManifestViewer
 import Element exposing (..)
+import Element.Background as Background
 import Element.Border as Border
 import Element.Events as Events
 import Element.Font as Font
+import Json.Encode as Encode
 import Manifest exposing (Manifest)
 import Manifest.Color
 import Material.Icons.Outlined as MaterialIcons
@@ -110,6 +114,8 @@ type Msg
     = Save Manifest
     | Edit
     | Delete Manifest
+    | UpdateManifest (List Problem) Manifest
+    | CopyToClipboard String
     | SyncShared
 
 
@@ -133,8 +139,39 @@ update msg model =
         Delete manifest ->
             ( model, Cmd.none )
 
+        UpdateManifest problems manifest ->
+            ( { model
+                | manifest = Just manifest
+                , problems = problems
+                , colors = updateColors model.colors manifest
+              }
+            , Cmd.none
+            )
+
+        CopyToClipboard elemId ->
+            ( model
+            , Api.copyToClipboard (Encode.string elemId)
+            )
+
         SyncShared ->
             ( model, Cmd.none )
+
+
+updateColors : Colors -> Manifest -> Colors
+updateColors currentColors manifest =
+    { backgroundColor =
+        Maybe.withDefault currentColors.backgroundColor <|
+            Manifest.Color.fromHex manifest.backgroundColor
+    , themeColor =
+        Maybe.withDefault currentColors.themeColor <|
+            Manifest.Color.fromHex manifest.themeColor
+    , fontColor =
+        Maybe.withDefault currentColors.fontColor <|
+            Manifest.Color.contrast manifest.backgroundColor
+    , themeFontColor =
+        Maybe.withDefault currentColors.themeFontColor <|
+            Manifest.Color.contrast manifest.themeColor
+    }
 
 
 save : Model -> Shared.Model -> Shared.Model
@@ -191,18 +228,15 @@ view model =
     , body =
         [ case model.device.class of
             Phone ->
-                column [ width fill, paddingXY 10 20 ] []
+                column [ width fill, paddingXY 10 20 ]
+                    [ paragraph [ Font.center ] [ text "Please use a tablet or desktop computer to edit manifests." ]
+                    ]
 
             Tablet ->
                 case model.device.orientation of
                     Portrait ->
-                        column [ width fill, paddingXY 10 20, spacing 20 ]
-                            [ viewEditorControls
-                                { maybeManifest = model.manifest
-                                , editMode = model.editMode
-                                , problems = model.problems
-                                , colors = model.colors
-                                }
+                        column [ width fill, paddingXY 10 20 ]
+                            [ paragraph [ Font.center ] [ text "Please use landscape mode to edit this manifest." ]
                             ]
 
                     Landscape ->
@@ -211,13 +245,36 @@ view model =
                             , width (px 1000)
                             , paddingXY 0 30
                             ]
-                            [ viewEditorControls
-                                { maybeManifest = model.manifest
-                                , editMode = model.editMode
-                                , problems = model.problems
-                                , colors = model.colors
-                                }
-                            ]
+                        <|
+                            case model.manifest of
+                                Just manifest ->
+                                    [ viewEditorControls
+                                        { manifest = manifest
+                                        , editMode = model.editMode
+                                        , problems = model.problems
+                                        , colors = model.colors
+                                        }
+                                    , row [ width fill, spacing 30 ]
+                                        [ case model.editMode of
+                                            Editing ->
+                                                ManifestEditor.view
+                                                    { manifest = manifest
+                                                    , problems = model.problems
+                                                    , colors = model.colors
+                                                    , onUpdateManifest = UpdateManifest
+                                                    }
+
+                                            NotEditing ->
+                                                ManifestViewer.view manifest
+                                        , ManifestOutputs.view
+                                            { manifest = manifest
+                                            , onCopyToClipboard = CopyToClipboard
+                                            }
+                                        ]
+                                    ]
+
+                                Nothing ->
+                                    [ none ]
 
             _ ->
                 column
@@ -225,46 +282,64 @@ view model =
                     , width (px 1000)
                     , paddingXY 0 30
                     ]
-                    [ viewEditorControls
-                        { maybeManifest = model.manifest
-                        , editMode = model.editMode
-                        , problems = model.problems
-                        , colors = model.colors
-                        }
-                    ]
+                <|
+                    case model.manifest of
+                        Just manifest ->
+                            [ viewEditorControls
+                                { manifest = manifest
+                                , editMode = model.editMode
+                                , problems = model.problems
+                                , colors = model.colors
+                                }
+                            , row [ width fill, spacing 30 ]
+                                [ case model.editMode of
+                                    Editing ->
+                                        ManifestEditor.view
+                                            { manifest = manifest
+                                            , problems = model.problems
+                                            , colors = model.colors
+                                            , onUpdateManifest = UpdateManifest
+                                            }
+
+                                    NotEditing ->
+                                        ManifestViewer.view manifest
+                                , ManifestOutputs.view
+                                    { manifest = manifest
+                                    , onCopyToClipboard = CopyToClipboard
+                                    }
+                                ]
+                            ]
+
+                        Nothing ->
+                            [ none ]
         ]
     }
 
 
 viewEditorControls :
-    { maybeManifest : Maybe Manifest
+    { manifest : Manifest
     , editMode : EditMode
     , problems : List Problem
     , colors : Colors
     }
     -> Element Msg
-viewEditorControls { maybeManifest, editMode, problems, colors } =
-    case maybeManifest of
-        Just manifest ->
-            row
-                [ width fill ]
-                [ case editMode of
-                    Editing ->
-                        viewEditControls
-                            { manifest = manifest
-                            , problems = problems
-                            , colors = colors
-                            }
+viewEditorControls { manifest, editMode, problems, colors } =
+    row
+        [ width fill ]
+        [ case editMode of
+            Editing ->
+                viewEditControls
+                    { manifest = manifest
+                    , problems = problems
+                    , colors = colors
+                    }
 
-                    NotEditing ->
-                        viewPreviewControls
-                            { manifest = manifest
-                            , colors = colors
-                            }
-                ]
-
-        Nothing ->
-            none
+            NotEditing ->
+                viewPreviewControls
+                    { manifest = manifest
+                    , colors = colors
+                    }
+        ]
 
 
 viewEditControls :
