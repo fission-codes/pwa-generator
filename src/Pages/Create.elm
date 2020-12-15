@@ -168,7 +168,6 @@ view model =
                             [ centerX
                             , width (px 1000)
                             , paddingXY 0 30
-                            , spacing 30
                             ]
                             [ viewEditorControls
                                 { manifest = model.manifest
