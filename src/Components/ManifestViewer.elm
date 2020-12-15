@@ -23,7 +23,7 @@ view :
 view { manifest, fontColor } =
     column
         [ alignTop
-        , width fill
+        , width (px 480)
         , padding 10
         , spacing 25
         , Font.color fontColor
