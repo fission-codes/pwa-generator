@@ -54,6 +54,39 @@ webnative.initialize(fissionInit).then(async state => {
   app.ports.login.subscribe(() => {
     webnative.redirectToLobby(state.permissions);
   });
+
+  /* PERSISTENCE */
+
+  app.ports.load.subscribe(async shortName => {
+    const path = fs.appPath([
+      `${shortName}`,
+      `${shortName}.json`
+    ]);
+    const manifest = JSON.parse(await fs.read(path));
+    app.ports.onManifestLoaded.send(manifest);
+  });
+
+  app.ports.save.subscribe(async manifest => {
+    const path = fs.appPath([
+      `${manifest.shortName}`,
+      `${manifest.shortname}.json`
+    ]);
+
+    await fs.write(path, JSON.stringify(manifest));
+    await fs.publish();
+    app.ports.onManifestSaved.send(manifest);
+  });
+
+  app.ports.delete.subscribe(async manifest => {
+    const path = fs.appPath([
+      `${manifest.shortName}`,
+      `${manifest.shortName}.json`
+    ]);
+
+    await fs.rm(path);
+    await fs.publish();
+    app.ports.onManifestDeleted.send(manifest);
+  });
 });
 
 

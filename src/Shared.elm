@@ -70,6 +70,9 @@ init flags url key =
 type Msg
     = Login
     | GotSession Session
+    | GotManifests (List Manifest)
+    | GotManifestSaved (Maybe Manifest)
+    | GotManifestDeleted (Maybe Manifest)
     | GotWindowResize Window
 
 
@@ -86,6 +89,40 @@ update msg model =
             , Cmd.none
             )
 
+        GotManifests manifests ->
+            ( { model | manifests = manifests ++ model.manifests }
+            , Cmd.none
+            )
+
+        GotManifestSaved maybeManifest ->
+            case maybeManifest of
+                Just manifest ->
+                    ( { model
+                        | manifests =
+                            manifest
+                                :: List.filter
+                                    (\m -> m.shortName /= manifest.shortName)
+                                    model.manifests
+                      }
+                    , Cmd.none
+                    )
+
+                Nothing ->
+                    ( model, Cmd.none )
+
+        GotManifestDeleted maybeManifest ->
+            case maybeManifest of
+                Just manifest ->
+                    ( { model
+                        | manifests =
+                            List.filter (\m -> m /= manifest) model.manifests
+                      }
+                    , Cmd.none
+                    )
+
+                Nothing ->
+                    ( model, Cmd.none )
+
         GotWindowResize window ->
             ( { model | device = classifyDevice window }
             , Cmd.none
@@ -96,6 +133,9 @@ subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch
         [ Session.changes GotSession
+        , Api.gotManifests GotManifests
+        , Api.gotManifestSaved GotManifestSaved
+        , Api.gotManifestDeleted GotManifestDeleted
         , Browser.Events.onResize
             (\width height ->
                 GotWindowResize { width = width, height = height }
