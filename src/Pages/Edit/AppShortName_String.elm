@@ -1,6 +1,7 @@
 module Pages.Edit.AppShortName_String exposing (Model, Msg, Params, page)
 
 import Api
+import Browser.Navigation exposing (Key)
 import Components.ManifestEditor as ManifestEditor exposing (Problem)
 import Components.ManifestOutputs as ManifestOutputs
 import Components.ManifestViewer as ManifestViewer
@@ -51,6 +52,7 @@ type EditMode
 
 type alias Model =
     { session : Session
+    , key : Key
     , device : Device
     , appShortName : String
     , manifest : Maybe Manifest
@@ -72,10 +74,6 @@ init shared { params } =
         colors =
             case maybeManifest of
                 Just manifest ->
-                    let
-                        dbg =
-                            Debug.log "manifest" manifest
-                    in
                     { backgroundColor =
                         Maybe.withDefault Colors.lightPurple <|
                             Manifest.Color.fromHex manifest.backgroundColor
@@ -94,6 +92,7 @@ init shared { params } =
                     Colors.init
     in
     ( { session = shared.session
+      , key = shared.key
       , device = shared.device
       , appShortName = params.appShortName
       , manifest = maybeManifest
@@ -126,7 +125,7 @@ update msg model =
             ( { model
                 | editMode = NotEditing
               }
-            , Cmd.none
+            , Api.save (Manifest.encode manifest)
             )
 
         Edit ->
@@ -137,7 +136,12 @@ update msg model =
             )
 
         Delete manifest ->
-            ( model, Cmd.none )
+            ( model
+            , Cmd.batch
+                [ Api.delete (Manifest.encode manifest)
+                , Browser.Navigation.replaceUrl model.key (Route.toString Route.Top)
+                ]
+            )
 
         UpdateManifest problems manifest ->
             ( { model
@@ -181,8 +185,8 @@ save model shared =
 
 {-| We want to load the manifest once after the user authenticates.
 After each write to web native, we update the manifest in Shared, which
-keeps it in sync when we return to the page. Loading it once prevents
-a data tug-of-war while the user it editing.
+keeps it in sync when we return to the page. But loading it once here
+prevents a data tug-of-war while the user it editing.
 -}
 load : Shared.Model -> Model -> ( Model, Cmd Msg )
 load shared model =

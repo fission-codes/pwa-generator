@@ -93,14 +93,14 @@ webnative.initialize(fissionInit).then(async state => {
   });
 
   app.ports.delete.subscribe(async manifest => {
-    const path = fs.appPath([
-      `${manifest.short_name}`,
-      `${manifest.short_name}.json`
-    ]);
+    const manifestDirectory = fs.appPath(`${manifest.short_name}`);
+    const manifestDirectoryExists = await fs.exists(manifestDirectory);
 
-    await fs.rm(path);
-    await fs.publish();
-    app.ports.onManifestDeleted.send(manifest);
+    if (manifestDirectoryExists) {
+      await fs.rm(manifestDirectory);
+      await fs.publish();
+      app.ports.onManifestDeleted.send(manifest);
+    }
   });
 });
 
