@@ -225,7 +225,7 @@ viewEditorControls :
 viewEditorControls { manifest, problems, colors } =
     row
         [ width fill ]
-        [ row [ alignRight, spacing 5, Font.color Colors.darkGray ]
+        [ row [ alignRight, spacing 5 ]
             [ if List.isEmpty problems then
                 el [ Events.onClick (Save manifest), Font.color colors.fontColor ] <|
                     html <|
