@@ -4,7 +4,7 @@ import Element exposing (..)
 import Element.Background as Background
 import Element.Border as Border
 import Element.Font as Font
-import Html.Attributes exposing (manifest)
+import Html.Attributes exposing (align, manifest)
 import Manifest exposing (Manifest)
 import Manifest.Color
 import Manifest.Display as Display
@@ -18,6 +18,7 @@ import Spa.Generated.Route as Route
 import Spa.Page as Page exposing (Page)
 import Spa.Url exposing (Url)
 import UI.Colors as Colors exposing (Colors)
+import UI.Fonts as Fonts
 
 
 page : Page Params Model Msg
@@ -220,57 +221,56 @@ viewManifest device manifest =
                     ]
                 , Border.color Colors.lightGray
                 , htmlAttribute (Html.Attributes.class "adaptive-border-color")
+                , Font.family Fonts.karla
                 ]
             <|
-                [ column []
-                    [ image [ width (Element.px 24) ]
+                [ row [ alignLeft, spacing 10 ]
+                    [ image [ width (px 24) ]
                         { src = "../public/images/badge-outline-colored.svg"
                         , description = "App Icon goes here"
                         }
+                    , column [ width fill ]
+                        [ text manifest.name
+                        ]
                     ]
-                , column [ width fill ]
-                    [ text manifest.name
+                , row [ alignRight, spacing 20 ] <|
+                    [ column
+                        [ Background.color (viewColor manifest.backgroundColor)
+                        , Border.color Colors.lightGray
+                        , Border.width 1
+                        , width (px 24)
+                        , height (px 24)
+                        ]
+                        []
+                    , column
+                        [ Background.color (viewColor manifest.themeColor)
+                        , Border.color Colors.lightGray
+                        , Border.width 1
+                        , width (px 24)
+                        , height (px 24)
+                        ]
+                        []
                     ]
-                , column
-                    [ Background.color (viewColor manifest.backgroundColor)
-                    , Border.color Colors.lightGray
-                    , Border.width 1
-                    , width (Element.px 24)
-                    , height (Element.px 24)
-                    ]
-                    []
-                , column
-                    [ Background.color (viewColor manifest.themeColor)
-                    , Border.color Colors.lightGray
-                    , Border.width 1
-                    , width (Element.px 24)
-                    , height (Element.px 24)
-                    ]
-                    []
+                        ++ (case device.class of
+                                Phone ->
+                                    [ none ]
+
+                                Tablet ->
+                                    case device.orientation of
+                                        Portrait ->
+                                            [ none ]
+
+                                        Landscape ->
+                                            [ column [ width (px 110) ]
+                                                [ text (Display.toString manifest.display) ]
+                                            ]
+
+                                _ ->
+                                    [ column [ width (px 110) ]
+                                        [ text (Display.toString manifest.display) ]
+                                    ]
+                           )
                 ]
-                    ++ (case device.class of
-                            Phone ->
-                                [ none ]
-
-                            Tablet ->
-                                case device.orientation of
-                                    Portrait ->
-                                        [ none ]
-
-                                    Landscape ->
-                                        [ column []
-                                            [ text (Display.toString manifest.display) ]
-                                        , column []
-                                            [ text (Orientation.toString manifest.orientation) ]
-                                        ]
-
-                            _ ->
-                                [ column []
-                                    [ text (Display.toString manifest.display) ]
-                                , column []
-                                    [ text (Orientation.toString manifest.orientation) ]
-                                ]
-                       )
         }
 
 
