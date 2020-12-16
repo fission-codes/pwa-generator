@@ -1,6 +1,7 @@
 module Pages.Edit.AppShortName_String exposing (Model, Msg, Params, page)
 
 import Api
+import Browser.Navigation exposing (Key)
 import Components.ManifestEditor as ManifestEditor exposing (Problem)
 import Components.ManifestOutputs as ManifestOutputs
 import Components.ManifestViewer as ManifestViewer
@@ -51,6 +52,7 @@ type EditMode
 
 type alias Model =
     { session : Session
+    , key : Key
     , device : Device
     , appShortName : String
     , manifest : Maybe Manifest
@@ -72,10 +74,6 @@ init shared { params } =
         colors =
             case maybeManifest of
                 Just manifest ->
-                    let
-                        dbg =
-                            Debug.log "manifest" manifest
-                    in
                     { backgroundColor =
                         Maybe.withDefault Colors.lightPurple <|
                             Manifest.Color.fromHex manifest.backgroundColor
@@ -94,6 +92,7 @@ init shared { params } =
                     Colors.init
     in
     ( { session = shared.session
+      , key = shared.key
       , device = shared.device
       , appShortName = params.appShortName
       , manifest = maybeManifest
@@ -126,7 +125,7 @@ update msg model =
             ( { model
                 | editMode = NotEditing
               }
-            , Cmd.none
+            , Api.save (Manifest.encode manifest)
             )
 
         Edit ->
@@ -137,7 +136,12 @@ update msg model =
             )
 
         Delete manifest ->
-            ( model, Cmd.none )
+            ( model
+            , Cmd.batch
+                [ Api.delete (Manifest.encode manifest)
+                , Browser.Navigation.replaceUrl model.key (Route.toString Route.Top)
+                ]
+            )
 
         UpdateManifest problems manifest ->
             ( { model
@@ -181,8 +185,8 @@ save model shared =
 
 {-| We want to load the manifest once after the user authenticates.
 After each write to web native, we update the manifest in Shared, which
-keeps it in sync when we return to the page. Loading it once prevents
-a data tug-of-war while the user it editing.
+keeps it in sync when we return to the page. But loading it once here
+prevents a data tug-of-war while the user it editing.
 -}
 load : Shared.Model -> Model -> ( Model, Cmd Msg )
 load shared model =
@@ -209,7 +213,7 @@ load shared model =
                 , device = shared.device
                 , manifest = maybeManifest
               }
-            , Cmd.none
+            , Task.perform (\_ -> SyncShared) (Task.succeed Nothing)
             )
 
 
@@ -226,32 +230,32 @@ view : Model -> Document Msg
 view model =
     { title = "Editing " ++ model.appShortName
     , body =
-        [ case model.device.class of
-            Phone ->
-                column [ width fill, paddingXY 10 20 ]
-                    [ paragraph [ Font.center, Font.color model.colors.fontColor ]
-                        [ text "Please use a tablet or desktop computer to edit manifests." ]
-                    ]
-
-            Tablet ->
-                case model.device.orientation of
-                    Portrait ->
+        [ case model.manifest of
+            Just manifest ->
+                case model.device.class of
+                    Phone ->
                         column [ width fill, paddingXY 10 20 ]
                             [ paragraph [ Font.center, Font.color model.colors.fontColor ]
-                                [ text "Please use landscape mode to edit this manifest." ]
+                                [ text "Please use a tablet or desktop computer to edit manifests." ]
                             ]
 
-                    Landscape ->
-                        column
-                            [ centerX
-                            , width (px 1000)
-                            , paddingXY 0 30
-                            ]
-                        <|
-                            case model.manifest of
-                                Just manifest ->
+                    Tablet ->
+                        case model.device.orientation of
+                            Portrait ->
+                                column [ width fill, paddingXY 10 20 ]
+                                    [ paragraph [ Font.center, Font.color model.colors.fontColor ]
+                                        [ text "Please use landscape mode to edit this manifest." ]
+                                    ]
+
+                            Landscape ->
+                                column
+                                    [ centerX
+                                    , width (px 1000)
+                                    , paddingXY 0 30
+                                    ]
                                     [ viewEditorControls
-                                        { manifest = manifest
+                                        { session = model.session
+                                        , manifest = manifest
                                         , editMode = model.editMode
                                         , problems = model.problems
                                         , colors = model.colors
@@ -278,20 +282,15 @@ view model =
                                         ]
                                     ]
 
-                                Nothing ->
-                                    [ none ]
-
-            _ ->
-                column
-                    [ centerX
-                    , width (px 1000)
-                    , paddingXY 0 30
-                    ]
-                <|
-                    case model.manifest of
-                        Just manifest ->
+                    _ ->
+                        column
+                            [ centerX
+                            , width (px 1000)
+                            , paddingXY 0 30
+                            ]
                             [ viewEditorControls
-                                { manifest = manifest
+                                { session = model.session
+                                , manifest = manifest
                                 , editMode = model.editMode
                                 , problems = model.problems
                                 , colors = model.colors
@@ -318,36 +317,42 @@ view model =
                                 ]
                             ]
 
-                        Nothing ->
-                            [ none ]
+            Nothing ->
+                viewLoadingAnimation
         ]
     }
 
 
 viewEditorControls :
-    { manifest : Manifest
+    { session : Session
+    , manifest : Manifest
     , editMode : EditMode
     , problems : List Problem
     , colors : Colors
     }
     -> Element Msg
-viewEditorControls { manifest, editMode, problems, colors } =
-    row
-        [ width fill ]
-        [ case editMode of
-            Editing ->
-                viewEditControls
-                    { manifest = manifest
-                    , problems = problems
-                    , colors = colors
-                    }
+viewEditorControls { session, manifest, editMode, problems, colors } =
+    case Session.viewer session of
+        Just viewer ->
+            row
+                [ width fill ]
+                [ case editMode of
+                    Editing ->
+                        viewEditControls
+                            { manifest = manifest
+                            , problems = problems
+                            , colors = colors
+                            }
 
-            NotEditing ->
-                viewPreviewControls
-                    { manifest = manifest
-                    , colors = colors
-                    }
-        ]
+                    NotEditing ->
+                        viewPreviewControls
+                            { manifest = manifest
+                            , colors = colors
+                            }
+                ]
+
+        Nothing ->
+            none
 
 
 viewEditControls :
@@ -385,3 +390,8 @@ viewPreviewControls { manifest, colors } =
             html <|
                 MaterialIcons.delete 30 Inherit
         ]
+
+
+viewLoadingAnimation : Element Msg
+viewLoadingAnimation =
+    column [ width fill, padding 20 ] [ el [ centerX ] (text "Loading animation goes here") ]
