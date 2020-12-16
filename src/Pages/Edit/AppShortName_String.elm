@@ -254,7 +254,8 @@ view model =
                                     , paddingXY 0 30
                                     ]
                                     [ viewEditorControls
-                                        { manifest = manifest
+                                        { session = model.session
+                                        , manifest = manifest
                                         , editMode = model.editMode
                                         , problems = model.problems
                                         , colors = model.colors
@@ -288,7 +289,8 @@ view model =
                             , paddingXY 0 30
                             ]
                             [ viewEditorControls
-                                { manifest = manifest
+                                { session = model.session
+                                , manifest = manifest
                                 , editMode = model.editMode
                                 , problems = model.problems
                                 , colors = model.colors
@@ -322,29 +324,35 @@ view model =
 
 
 viewEditorControls :
-    { manifest : Manifest
+    { session : Session
+    , manifest : Manifest
     , editMode : EditMode
     , problems : List Problem
     , colors : Colors
     }
     -> Element Msg
-viewEditorControls { manifest, editMode, problems, colors } =
-    row
-        [ width fill ]
-        [ case editMode of
-            Editing ->
-                viewEditControls
-                    { manifest = manifest
-                    , problems = problems
-                    , colors = colors
-                    }
+viewEditorControls { session, manifest, editMode, problems, colors } =
+    case Session.viewer session of
+        Just viewer ->
+            row
+                [ width fill ]
+                [ case editMode of
+                    Editing ->
+                        viewEditControls
+                            { manifest = manifest
+                            , problems = problems
+                            , colors = colors
+                            }
 
-            NotEditing ->
-                viewPreviewControls
-                    { manifest = manifest
-                    , colors = colors
-                    }
-        ]
+                    NotEditing ->
+                        viewPreviewControls
+                            { manifest = manifest
+                            , colors = colors
+                            }
+                ]
+
+        Nothing ->
+            none
 
 
 viewEditControls :

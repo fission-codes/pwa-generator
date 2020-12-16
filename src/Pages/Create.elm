@@ -175,7 +175,8 @@ view model =
                             , paddingXY 0 30
                             ]
                             [ viewEditorControls
-                                { manifest = model.manifest
+                                { session = model.session
+                                , manifest = model.manifest
                                 , problems = model.problems
                                 , colors = model.colors
                                 }
@@ -200,7 +201,8 @@ view model =
                     , paddingXY 0 30
                     ]
                     [ viewEditorControls
-                        { manifest = model.manifest
+                        { session = model.session
+                        , manifest = model.manifest
                         , problems = model.problems
                         , colors = model.colors
                         }
@@ -222,24 +224,30 @@ view model =
 
 
 viewEditorControls :
-    { manifest : Manifest
+    { session : Session
+    , manifest : Manifest
     , problems : List Problem
     , colors : Colors
     }
     -> Element Msg
-viewEditorControls { manifest, problems, colors } =
-    row
-        [ width fill ]
-        [ row [ alignRight, spacing 5 ]
-            [ if List.isEmpty problems then
-                el [ Events.onClick (Save manifest), Font.color colors.fontColor ] <|
-                    html <|
-                        MaterialIcons.save 30 Inherit
+viewEditorControls { session, manifest, problems, colors } =
+    case Session.viewer session of
+        Just viewer ->
+            row
+                [ width fill ]
+                [ row [ alignRight, spacing 5 ]
+                    [ if List.isEmpty problems then
+                        el [ Events.onClick (Save manifest), Font.color colors.fontColor ] <|
+                            html <|
+                                MaterialIcons.save 30 Inherit
 
-              else
-                none
-            , el [ Events.onClick Cancel, Font.color colors.fontColor ] <|
-                html <|
-                    MaterialIcons.delete 30 Inherit
-            ]
-        ]
+                      else
+                        none
+                    , el [ Events.onClick Cancel, Font.color colors.fontColor ] <|
+                        html <|
+                            MaterialIcons.delete 30 Inherit
+                    ]
+                ]
+
+        Nothing ->
+            none
