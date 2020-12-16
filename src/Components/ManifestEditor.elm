@@ -86,7 +86,7 @@ view ({ manifest, problems, colors, onUpdateManifest } as options) =
     column
         [ alignTop
         , centerX
-        , width (px 480)
+        , width (px 470)
         , height fill
         , padding 10
         , spacing 25
