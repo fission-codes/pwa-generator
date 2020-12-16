@@ -153,14 +153,16 @@ view model =
         [ case model.device.class of
             Phone ->
                 column [ width fill, paddingXY 10 20 ]
-                    [ paragraph [ Font.center ] [ text "Please use a tablet or desktop computer to create manifests." ]
+                    [ paragraph [ Font.center, Font.color model.colors.fontColor ]
+                        [ text "Please use a tablet or desktop computer to create manifests." ]
                     ]
 
             Tablet ->
                 case model.device.orientation of
                     Portrait ->
                         column [ width fill, paddingXY 10 20 ]
-                            [ paragraph [ Font.center ] [ text "Please use landscape mode to create a manifest." ]
+                            [ paragraph [ Font.center, Font.color model.colors.fontColor ]
+                                [ text "Please use landscape mode to create a manifest." ]
                             ]
 
                     Landscape ->
