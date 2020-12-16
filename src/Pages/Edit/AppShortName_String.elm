@@ -213,7 +213,7 @@ load shared model =
                 , device = shared.device
                 , manifest = maybeManifest
               }
-            , Cmd.none
+            , Task.perform (\_ -> SyncShared) (Task.succeed Nothing)
             )
 
 

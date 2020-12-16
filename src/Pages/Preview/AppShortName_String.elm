@@ -119,11 +119,19 @@ save model shared =
 
 load : Shared.Model -> Model -> ( Model, Cmd Msg )
 load shared model =
+    let
+        maybeManifest =
+            List.head <|
+                List.filter
+                    (\manifest -> manifest.shortName == model.appShortName)
+                    shared.manifests
+    in
     ( { model
         | session = shared.session
         , device = shared.device
+        , manifest = maybeManifest
       }
-    , Cmd.none
+    , Task.perform (\_ -> SyncShared) (Task.succeed Nothing)
     )
 
 
