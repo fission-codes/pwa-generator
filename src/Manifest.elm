@@ -82,7 +82,7 @@ placeholders : List Manifest
 placeholders =
     [ Manifest
         "Deluxe Chess"
-        "chess"
+        "Deluxe Chess"
         "A full-featured chess game."
         "en-US"
         "/"
@@ -94,7 +94,7 @@ placeholders =
         []
     , Manifest
         "Ultimate Crypto Plunge"
-        "crypto plunge"
+        "Cryptoplunge"
         "Learn cryptography through puzzles"
         "hr"
         "/"

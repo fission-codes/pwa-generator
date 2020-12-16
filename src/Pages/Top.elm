@@ -230,7 +230,7 @@ viewManifest device manifest =
                         , description = "App Icon goes here"
                         }
                     , column [ width fill ]
-                        [ text manifest.name
+                        [ text manifest.shortName
                         ]
                     ]
                 , row [ alignRight, spacing 20 ] <|
