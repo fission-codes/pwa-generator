@@ -178,7 +178,7 @@ view { page, toMsg } model =
                                 [ Font.size 28
                                 , Font.family Fonts.workSans
                                 ]
-                                (text "Fission PWA Generator")
+                                (text "PWA Generator")
                             ]
                     }
                 , viewSignInButton
