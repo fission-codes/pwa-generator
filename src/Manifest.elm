@@ -94,7 +94,7 @@ placeholders =
         []
     , Manifest
         "Ultimate Crypto Plunge"
-        "cryptoplunge"
+        "crypto plunge"
         "Learn cryptography through puzzles"
         "hr"
         "/"

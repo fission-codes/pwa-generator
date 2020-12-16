@@ -20,6 +20,7 @@ import Spa.Page as Page exposing (Page)
 import Spa.Url as Url exposing (Url)
 import Task
 import UI.Colors as Colors exposing (Colors)
+import Url
 
 
 page : Page Params Model Msg
@@ -54,10 +55,18 @@ type alias Model =
 init : Shared.Model -> Url Params -> ( Model, Cmd Msg )
 init shared { params } =
     let
+        appShortName =
+            case Url.percentDecode params.appShortName of
+                Just name ->
+                    name
+
+                Nothing ->
+                    "Short name decoding failed"
+
         maybeManifest =
             List.head <|
                 List.filter
-                    (\manifest -> manifest.shortName == params.appShortName)
+                    (\manifest -> manifest.shortName == appShortName)
                     shared.manifests
 
         colors =
@@ -82,7 +91,7 @@ init shared { params } =
     in
     ( { session = shared.session
       , device = shared.device
-      , appShortName = params.appShortName
+      , appShortName = appShortName
       , colors = colors
       , manifest = maybeManifest
       }
