@@ -1,3 +1,7 @@
 .adaptive-color {
   transition: color ease-in 0.5s, background-color ease-in 0.5s;
 }
+
+.adaptive-border-color {
+  transition: border-color ease-in 0.2s;
+}
