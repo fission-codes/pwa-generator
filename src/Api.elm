@@ -1,9 +1,12 @@
 port module Api exposing
     ( copyToClipboard
+    , delete
     , gotManifestDeleted
     , gotManifestSaved
     , gotManifests
+    , load
     , login
+    , save
     , viewerChanges
     )
 
@@ -86,7 +89,7 @@ port onManifestsLoaded : (Encode.Value -> msg) -> Sub msg
 
 gotManifests : (List Manifest -> msg) -> Sub msg
 gotManifests toMsg =
-    onManifestLoaded <|
+    onManifestsLoaded <|
         \value ->
             toMsg <|
                 case Decode.decodeValue (Decode.list Manifest.decoder) value of

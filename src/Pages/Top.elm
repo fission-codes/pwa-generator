@@ -84,6 +84,7 @@ load shared model =
     ( { model
         | session = shared.session
         , device = shared.device
+        , manifests = shared.manifests
       }
     , Cmd.none
     )

@@ -43,6 +43,13 @@ webnative.initialize(fissionInit).then(async state => {
         await fs.publish();
       }
 
+      const manifestDirectories = await fs.ls(appPath);
+      const manifests = await Promise.all(Object.keys(manifestDirectories).map(async shortName => {
+        const path = fs.appPath([`${shortName}`, `${shortName}.json`]);
+        return JSON.parse(await fs.read(path));
+      }));
+      app.ports.onManifestsLoaded.send(manifests);
+
       break;
 
     case webnative.Scenario.NotAuthorised:
@@ -57,30 +64,38 @@ webnative.initialize(fissionInit).then(async state => {
 
   /* PERSISTENCE */
 
-  app.ports.load.subscribe(async shortName => {
-    const path = fs.appPath([
-      `${shortName}`,
-      `${shortName}.json`
-    ]);
-    const manifest = JSON.parse(await fs.read(path));
-    app.ports.onManifestLoaded.send(manifest);
-  });
+  // app.ports.load.subscribe(async shortName => {
+  //   const path = fs.appPath([
+  //     `${shortName}`,
+  //     `${shortName}.json`
+  //   ]);
+  //   const manifest = JSON.parse(await fs.read(path));
+  //   app.ports.onManifestLoaded.send(manifest);
+  // });
 
   app.ports.save.subscribe(async manifest => {
-    const path = fs.appPath([
-      `${manifest.shortName}`,
-      `${manifest.shortname}.json`
+    const manifestDirectory = fs.appPath(`${manifest.short_name}`);
+    const manifestDirectoryExists = await fs.exists(manifestDirectory);
+
+    if (!manifestDirectoryExists) {
+      await fs.mkdir(manifestDirectory);
+      await fs.publish();
+    }
+
+    const manifestPath = fs.appPath([
+      `${manifest.short_name}`,
+      `${manifest.short_name}.json`
     ]);
 
-    await fs.write(path, JSON.stringify(manifest));
+    await fs.write(manifestPath, JSON.stringify(manifest));
     await fs.publish();
     app.ports.onManifestSaved.send(manifest);
   });
 
   app.ports.delete.subscribe(async manifest => {
     const path = fs.appPath([
-      `${manifest.shortName}`,
-      `${manifest.shortName}.json`
+      `${manifest.short_name}`,
+      `${manifest.short_name}.json`
     ]);
 
     await fs.rm(path);

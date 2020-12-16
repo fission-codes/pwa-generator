@@ -96,7 +96,10 @@ update msg model =
 
         Save manifest ->
             ( model
-            , Cmd.none
+            , Cmd.batch
+                [ Api.save (Manifest.encode manifest)
+                , Browser.Navigation.replaceUrl model.key (Route.toString Route.Top)
+                ]
             )
 
         Cancel ->
