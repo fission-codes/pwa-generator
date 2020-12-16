@@ -230,30 +230,29 @@ view : Model -> Document Msg
 view model =
     { title = "Editing " ++ model.appShortName
     , body =
-        [ case model.device.class of
-            Phone ->
-                column [ width fill, paddingXY 10 20 ]
-                    [ paragraph [ Font.center, Font.color model.colors.fontColor ]
-                        [ text "Please use a tablet or desktop computer to edit manifests." ]
-                    ]
-
-            Tablet ->
-                case model.device.orientation of
-                    Portrait ->
+        [ case model.manifest of
+            Just manifest ->
+                case model.device.class of
+                    Phone ->
                         column [ width fill, paddingXY 10 20 ]
                             [ paragraph [ Font.center, Font.color model.colors.fontColor ]
-                                [ text "Please use landscape mode to edit this manifest." ]
+                                [ text "Please use a tablet or desktop computer to edit manifests." ]
                             ]
 
-                    Landscape ->
-                        column
-                            [ centerX
-                            , width (px 1000)
-                            , paddingXY 0 30
-                            ]
-                        <|
-                            case model.manifest of
-                                Just manifest ->
+                    Tablet ->
+                        case model.device.orientation of
+                            Portrait ->
+                                column [ width fill, paddingXY 10 20 ]
+                                    [ paragraph [ Font.center, Font.color model.colors.fontColor ]
+                                        [ text "Please use landscape mode to edit this manifest." ]
+                                    ]
+
+                            Landscape ->
+                                column
+                                    [ centerX
+                                    , width (px 1000)
+                                    , paddingXY 0 30
+                                    ]
                                     [ viewEditorControls
                                         { manifest = manifest
                                         , editMode = model.editMode
@@ -282,18 +281,12 @@ view model =
                                         ]
                                     ]
 
-                                Nothing ->
-                                    [ none ]
-
-            _ ->
-                column
-                    [ centerX
-                    , width (px 1000)
-                    , paddingXY 0 30
-                    ]
-                <|
-                    case model.manifest of
-                        Just manifest ->
+                    _ ->
+                        column
+                            [ centerX
+                            , width (px 1000)
+                            , paddingXY 0 30
+                            ]
                             [ viewEditorControls
                                 { manifest = manifest
                                 , editMode = model.editMode
@@ -322,8 +315,8 @@ view model =
                                 ]
                             ]
 
-                        Nothing ->
-                            [ none ]
+            Nothing ->
+                viewLoadingAnimation
         ]
     }
 
@@ -389,3 +382,8 @@ viewPreviewControls { manifest, colors } =
             html <|
                 MaterialIcons.delete 30 Inherit
         ]
+
+
+viewLoadingAnimation : Element Msg
+viewLoadingAnimation =
+    column [ width fill, padding 20 ] [ el [ centerX ] (text "Loading animation goes here") ]
