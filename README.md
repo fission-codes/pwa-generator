@@ -2,16 +2,6 @@
 
 An app for generating PWA apps.
 
-## Setup
-
-Install [Elm](https://guide.elm-lang.org/install.html) v0.19.1,[TypeScript](https://www.typescriptlang.org/index.html#download-links), and [Parcel](https://parceljs.org/getting_started.html).
-
-Clone this repository and install its dependencies:
-
-```
-npm install
-```
-
 ## Develop
 
 To work on the application locally:
